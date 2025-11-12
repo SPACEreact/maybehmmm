@@ -10,13 +10,15 @@ import PromptViewer from './components/PromptViewer';
 import Chatbot from './components/Chatbot';
 import StartScreen from './components/StartScreen';
 import ScriptProcessor from './components/ScriptProcessor';
-import { CameraIcon, FilmIcon, SparklesIcon, ChatIcon, ClipboardListIcon } from './components/Icon';
+import { CameraIcon, FilmIcon, SparklesIcon, ChatIcon, ClipboardListIcon, HeartIcon } from './components/Icon';
 import { generateChatResponse, getInitialScene } from './services/geminiService';
 
 
 const App: React.FC = () => {
   const [appMode, setAppMode] = useState<AppMode>(AppMode.SELECTION);
   const [step, setStep] = useState<AppStep>(AppStep.STORY);
+  const [isPastelMode, setIsPastelMode] = useState(false);
+
   const [story, setStory] = useState<Story>({
     title: '',
     logline: '',
@@ -56,6 +58,14 @@ const App: React.FC = () => {
     };
     initializeScene();
   }, [step, appMode, story, directorVision, sceneEmotionalCore]);
+  
+  useEffect(() => {
+    if (isPastelMode) {
+      setChatMessages([{ sender: 'gemini', text: "Welcome to Pastel Mode! How about we create a whimsical fairytale today?" }]);
+    } else {
+      setChatMessages([{ sender: 'gemini', text: "Hello! I'm your AI filmmaking assistant. Ask me anything about scriptwriting, cinematography, or for creative ideas." }]);
+    }
+  }, [isPastelMode]);
 
   const handleNext = () => {
     if (step === AppStep.STORY) setStep(AppStep.VISION);
@@ -132,6 +142,7 @@ const App: React.FC = () => {
     switch(appMode) {
       case AppMode.SELECTION:
         return <StartScreen 
+                  isPastelMode={isPastelMode}
                   onSelectCreator={() => setAppMode(AppMode.CREATOR)} 
                   onSelectScript={() => setAppMode(AppMode.SCRIPT_INPUT)} 
                />;
@@ -160,31 +171,34 @@ const App: React.FC = () => {
     }
   }
 
-
+  const appTitle = "Cinematic Prompt Weaver";
+  const landingTitle = "well, it creates shot list and prompts while maintaining respect for your creative freedom - by himanshu (made with heart)";
+  
   return (
-    <div className="bg-gray-900 text-white min-h-screen font-sans">
+    <div className={`text-white min-h-screen font-sans transition-colors duration-500 ${isPastelMode ? 'bg-pink-200' : 'bg-gray-900'}`}>
       <div className="container mx-auto px-4 py-8">
         <header className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-indigo-600">
-            Cinematic Prompt Weaver
+           <h1 className={`font-extrabold tracking-tight transition-colors duration-500 ${appMode === AppMode.SELECTION ? 'text-3xl md:text-4xl leading-tight' : 'text-4xl md:text-5xl'} ${isPastelMode ? 'text-pink-800' : 'bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-indigo-600'}`}>
+            <div className="flex items-center justify-center gap-4">
+              {appMode === AppMode.SELECTION ? landingTitle : appTitle}
+              {appMode === AppMode.SELECTION && (
+                 <button onClick={() => setIsPastelMode(!isPastelMode)} className={`transition-all ${isPastelMode ? 'text-pink-500' : 'text-purple-400'} hover:scale-110`}>
+                    <HeartIcon />
+                 </button>
+              )}
+            </div>
           </h1>
-          <p className="mt-4 text-lg text-gray-400 max-w-2xl mx-auto">
-            {appMode === AppMode.CREATOR 
-              ? "Craft your narrative, design your shots, and generate AI prompts that bring your vision to life." 
-              : "Instantly transform your script into a cinematic shot list for your next viral hit."
-            }
-          </p>
         </header>
         
         {renderContent()}
         
-        <footer className="text-center mt-12 text-gray-500">
+        <footer className={`text-center mt-12 transition-colors duration-500 ${isPastelMode ? 'text-pink-600' : 'text-gray-500'}`}>
             <p>Powered by Gemini & React</p>
         </footer>
       </div>
 
       <div className="fixed bottom-6 right-6 z-40">
-        <button onClick={() => setIsChatOpen(!isChatOpen)} className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-full p-4 shadow-lg transition-transform hover:scale-110">
+        <button onClick={() => setIsChatOpen(!isChatOpen)} className={`text-white rounded-full p-4 shadow-lg transition-all hover:scale-110 ${isPastelMode ? 'bg-pink-500 hover:bg-pink-600' : 'bg-indigo-600 hover:bg-indigo-700'}`}>
           <ChatIcon />
         </button>
       </div>
@@ -195,6 +209,7 @@ const App: React.FC = () => {
         messages={chatMessages}
         onSendMessage={handleSendMessage}
         isThinking={isBotThinking}
+        isPastelMode={isPastelMode}
       />
     </div>
   );

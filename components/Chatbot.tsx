@@ -9,9 +9,10 @@ interface ChatbotProps {
   messages: ChatMessage[];
   onSendMessage: (message: string) => void;
   isThinking: boolean;
+  isPastelMode: boolean;
 }
 
-const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, messages, onSendMessage, isThinking }) => {
+const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, messages, onSendMessage, isThinking, isPastelMode }) => {
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -30,12 +31,30 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, messages, onSendMess
   };
 
   if (!isOpen) return null;
+  
+  const theme = {
+    bg: isPastelMode ? 'bg-pink-100' : 'bg-gray-800',
+    headerBorder: isPastelMode ? 'border-pink-200' : 'border-gray-700',
+    headerText: isPastelMode ? 'text-pink-900' : 'text-white',
+    closeIcon: isPastelMode ? 'text-pink-500 hover:text-pink-700' : 'text-gray-400 hover:text-white',
+    messageUserBg: isPastelMode ? 'bg-pink-500' : 'bg-indigo-600',
+    messageBotBg: isPastelMode ? 'bg-pink-200' : 'bg-gray-700',
+    messageBotText: isPastelMode ? 'text-pink-900' : 'text-gray-200',
+    footerBorder: isPastelMode ? 'border-pink-200' : 'border-gray-700',
+    inputBg: isPastelMode ? 'bg-white' : 'bg-gray-700',
+    inputBorder: isPastelMode ? 'border-pink-300' : 'border-gray-600',
+    inputText: isPastelMode ? 'text-pink-900' : 'text-white',
+    inputFocusRing: isPastelMode ? 'focus:ring-pink-400' : 'focus:ring-indigo-500',
+    inputFocusBorder: isPastelMode ? 'focus:border-pink-400' : 'focus:border-indigo-500',
+    sendButtonBg: isPastelMode ? 'bg-pink-500 hover:bg-pink-600' : 'bg-indigo-600 hover:bg-indigo-700',
+  };
+
 
   return (
-    <div className="fixed bottom-24 right-6 w-96 h-[60vh] bg-gray-800 shadow-2xl rounded-2xl flex flex-col z-50 animate-fade-in-up">
-      <header className="flex justify-between items-center p-4 border-b border-gray-700">
-        <h3 className="text-lg font-bold text-white">AI Filmmaking Assistant</h3>
-        <button onClick={onClose} className="text-gray-400 hover:text-white">
+    <div className={`fixed bottom-24 right-6 w-96 h-[60vh] shadow-2xl rounded-2xl flex flex-col z-50 animate-fade-in-up transition-colors duration-500 ${theme.bg}`}>
+      <header className={`flex justify-between items-center p-4 border-b ${theme.headerBorder}`}>
+        <h3 className={`text-lg font-bold ${theme.headerText}`}>AI Filmmaking Assistant</h3>
+        <button onClick={onClose} className={theme.closeIcon}>
           <CloseIcon />
         </button>
       </header>
@@ -43,14 +62,14 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, messages, onSendMess
       <div className="flex-1 p-4 overflow-y-auto space-y-4">
         {messages.map((msg, index) => (
           <div key={index} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${msg.sender === 'user' ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-gray-700 text-gray-200 rounded-bl-none'}`}>
+            <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${msg.sender === 'user' ? `${theme.messageUserBg} text-white rounded-br-none` : `${theme.messageBotBg} ${theme.messageBotText} rounded-bl-none`}`}>
               <p className="text-sm" style={{ whiteSpace: 'pre-wrap' }}>{msg.text}</p>
             </div>
           </div>
         ))}
          {isThinking && (
           <div className="flex justify-start">
-            <div className="max-w-xs lg:max-w-md px-4 py-3 rounded-2xl bg-gray-700 text-gray-200 rounded-bl-none flex items-center space-x-2">
+            <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl ${theme.messageBotBg} ${theme.messageBotText} rounded-bl-none flex items-center space-x-2`}>
                 <span className="w-2 h-2 bg-gray-400 rounded-full animate-pulse delay-75"></span>
                 <span className="w-2 h-2 bg-gray-400 rounded-full animate-pulse delay-150"></span>
                 <span className="w-2 h-2 bg-gray-400 rounded-full animate-pulse delay-300"></span>
@@ -60,17 +79,17 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, messages, onSendMess
         <div ref={messagesEndRef} />
       </div>
 
-      <footer className="p-4 border-t border-gray-700">
+      <footer className={`p-4 border-t ${theme.footerBorder}`}>
         <form onSubmit={handleSubmit} className="flex items-center gap-2">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask a question..."
-            className="flex-1 bg-gray-700 border-gray-600 rounded-full py-2 px-4 text-white focus:ring-indigo-500 focus:border-indigo-500"
+            className={`flex-1 rounded-full py-2 px-4 border transition-colors ${theme.inputBg} ${theme.inputBorder} ${theme.inputText} ${theme.inputFocusRing} ${theme.inputFocusBorder}`}
             disabled={isThinking}
           />
-          <button type="submit" disabled={isThinking || !input.trim()} className="bg-indigo-600 text-white rounded-full p-2 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-indigo-700">
+          <button type="submit" disabled={isThinking || !input.trim()} className={`text-white rounded-full p-2 disabled:opacity-50 disabled:cursor-not-allowed ${theme.sendButtonBg}`}>
             <SendIcon />
           </button>
         </form>
