@@ -39,6 +39,7 @@ export interface DirectorVision {
 export interface Shot {
   id: string;
   description: string;
+  characterBlocking: string;
   shotType: string;
   cameraAngle: string;
   cameraMovement: string;

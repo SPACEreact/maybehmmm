@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import type { Shot, Story, DirectorVision } from '../types';
 import { SHOT_TYPES, CAMERA_ANGLES, CAMERA_MOVEMENTS, FOCAL_LENGTHS, APERTURES, LIGHTING_STYLES, COLOR_GRADES, COMPOSITIONS } from '../constants';
@@ -12,6 +13,8 @@ interface ShotBuilderProps {
   onBack: () => void;
   onNext: () => void;
   isInitializing: boolean;
+  sceneEmotionalCore: string;
+  setSceneEmotionalCore: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const LoadingSpinner = () => (
@@ -21,7 +24,7 @@ const LoadingSpinner = () => (
     </svg>
 );
 
-const ShotEditor: React.FC<{ shot: Shot; onSave: (shot: Shot) => void; onCancel: () => void; story: Story; directorVision: DirectorVision; }> = ({ shot, onSave, onCancel, story, directorVision }) => {
+const ShotEditor: React.FC<{ shot: Shot; onSave: (shot: Shot) => void; onCancel: () => void; story: Story; directorVision: DirectorVision; sceneEmotionalCore: string; }> = ({ shot, onSave, onCancel, story, directorVision, sceneEmotionalCore }) => {
     const [editedShot, setEditedShot] = useState(shot);
     const [isSuggestingDetails, setIsSuggestingDetails] = useState(false);
     const [isSuggestingNote, setIsSuggestingNote] = useState(false);
@@ -48,7 +51,7 @@ const ShotEditor: React.FC<{ shot: Shot; onSave: (shot: Shot) => void; onCancel:
         }
         setIsSuggestingDetails(true);
         try {
-            const suggestedDetails = await getGeminiShotDetails(story, directorVision, editedShot.description);
+            const suggestedDetails = await getGeminiShotDetails(story, directorVision, editedShot.description, sceneEmotionalCore);
             setEditedShot(prev => ({...prev, ...suggestedDetails}));
         } catch (error) {
             console.error("Failed to get shot details:", error);
@@ -65,7 +68,7 @@ const ShotEditor: React.FC<{ shot: Shot; onSave: (shot: Shot) => void; onCancel:
         }
         setIsSuggestingNote(true);
         try {
-            const note = await getDirectorNoteSuggestion(story, directorVision, editedShot);
+            const note = await getDirectorNoteSuggestion(story, directorVision, editedShot, sceneEmotionalCore);
             setEditedShot(prev => ({ ...prev, directorNotes: note }));
         } catch (error) {
             console.error("Failed to suggest director's note:", error);
@@ -93,9 +96,9 @@ const ShotEditor: React.FC<{ shot: Shot; onSave: (shot: Shot) => void; onCancel:
                     </button>
                 </div>
                 
-                <div>
-                    <label className="block text-sm font-medium text-gray-300">Description</label>
-                    <textarea name="description" value={editedShot.description} onChange={handleChange} rows={2} className="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md text-white" placeholder="Describe the action or moment in this shot..."/>
+                <div className="space-y-4">
+                    <TextAreaControl label="Description" name="description" value={editedShot.description} onChange={handleChange} placeholder="Describe the action or moment in this shot..."/>
+                    <TextAreaControl label="Character Blocking" name="characterBlocking" value={editedShot.characterBlocking} onChange={handleChange} placeholder="e.g., Alex stands center frame, back to camera. Sarah enters from screen left."/>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 border-t border-b border-gray-700 py-6">
@@ -125,7 +128,7 @@ const ShotEditor: React.FC<{ shot: Shot; onSave: (shot: Shot) => void; onCancel:
                             {isSuggestingNote ? <LoadingSpinner /> : <MagicIcon />} Suggest Note
                         </button>
                     </label>
-                    <textarea name="directorNotes" value={editedShot.directorNotes} onChange={handleChange} rows={3} className="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md text-white" placeholder="Subtext: [Emotion]. Invention: [New Visual Element]. Shot: [Cinematic Technique] to capture the invention."/>
+                    <textarea name="directorNotes" value={editedShot.directorNotes} onChange={handleChange} rows={3} className="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md text-white" placeholder="Why: [The core emotion]. How: [The visual invention and technique]. Feel: [The intended rhythm and pace]."/>
                 </div>
 
                 <div className="flex justify-end space-x-4 pt-4">
@@ -183,7 +186,7 @@ const ShotCard: React.FC<{ shot: Shot; onEdit: () => void; onDelete: () => void;
     );
 };
 
-const ShotBuilder: React.FC<ShotBuilderProps> = ({ shots, setShots, story, directorVision, onBack, onNext, isInitializing }) => {
+const ShotBuilder: React.FC<ShotBuilderProps> = ({ shots, setShots, story, directorVision, onBack, onNext, isInitializing, sceneEmotionalCore, setSceneEmotionalCore }) => {
     const [editingShot, setEditingShot] = useState<Shot | null>(null);
     const [isSuggesting, setIsSuggesting] = useState(false);
     
@@ -196,12 +199,13 @@ const ShotBuilder: React.FC<ShotBuilderProps> = ({ shots, setShots, story, direc
         dragItem.current = position;
         setIsDragging(true);
     };
-
+    
+    // FIX: Defined the missing handleDragEnter function to update the dragOverItem ref.
     const handleDragEnter = (e: React.DragEvent<HTMLDivElement>, position: number) => {
         dragOverItem.current = position;
     };
-    
-    const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+
+    const handleDrop = () => {
         if (dragItem.current !== null && dragOverItem.current !== null) {
             const newShots = [...shots];
             const dragItemContent = newShots[dragItem.current];
@@ -216,7 +220,9 @@ const ShotBuilder: React.FC<ShotBuilderProps> = ({ shots, setShots, story, direc
 
     const createNewShot = (): Shot => ({
         id: new Date().toISOString(),
-        description: '', shotType: '', cameraAngle: '', cameraMovement: '',
+        description: '', 
+        characterBlocking: '',
+        shotType: '', cameraAngle: '', cameraMovement: '',
         focalLength: '50mm (Standard)', aperture: 'f/2.8 (Shallow)',
         lightingStyle: '', colorGrade: '', composition: 'Rule of Thirds',
         technicalSpecs: { camera: '', lighting: '', audio: '' },
@@ -248,13 +254,14 @@ const ShotBuilder: React.FC<ShotBuilderProps> = ({ shots, setShots, story, direc
     };
     
     const handleGetSuggestions = async () => {
+        if (!sceneEmotionalCore) {
+            alert("Please define the Scene's Emotional Core before getting suggestions.");
+            return;
+        }
         setIsSuggesting(true);
         try {
-            const sceneDescription = prompt("Describe the scene you want suggestions for (e.g., 'a tense confrontation in a dimly lit bar'):");
-            if(sceneDescription) {
-                const suggestedShots = await getGeminiSceneSuggestions(story, directorVision, sceneDescription);
-                setShots(prev => [...prev, ...suggestedShots]);
-            }
+            const suggestedShots = await getGeminiSceneSuggestions(story, directorVision, sceneEmotionalCore);
+            setShots(prev => [...prev, ...suggestedShots]);
         } catch (error) {
             console.error("Failed to get suggestions from Gemini:", error);
             alert("Sorry, there was an error getting suggestions. Please check your API key and try again.");
@@ -268,7 +275,7 @@ const ShotBuilder: React.FC<ShotBuilderProps> = ({ shots, setShots, story, direc
             <div className="flex flex-col items-center justify-center h-full min-h-[40vh] text-center">
                 <div className="w-12 h-12 text-indigo-400"><FilmIcon /></div>
                 <h3 className="text-2xl font-bold mt-4">Crafting Your Scene...</h3>
-                <p className="text-gray-400 mt-2">Our AI Cinematographer is creating a professional shot list for you.</p>
+                <p className="text-gray-400 mt-2">Our AI Creative Team is creating a professional shot list for you.</p>
                 <div className="mt-6">
                     <LoadingSpinner />
                 </div>
@@ -278,10 +285,23 @@ const ShotBuilder: React.FC<ShotBuilderProps> = ({ shots, setShots, story, direc
 
     return (
         <div className="space-y-8 animate-fade-in">
-             {editingShot && <ShotEditor shot={editingShot} onSave={handleSaveShot} onCancel={() => setEditingShot(null)} story={story} directorVision={directorVision} />}
+             {editingShot && <ShotEditor shot={editingShot} onSave={handleSaveShot} onCancel={() => setEditingShot(null)} story={story} directorVision={directorVision} sceneEmotionalCore={sceneEmotionalCore} />}
             <div>
                 <h2 className="text-2xl font-bold text-gray-100 mb-4">Design Your Scene</h2>
-                <p className="text-gray-400">Build your scene shot by shot. Drag and drop to reorder. The more detail you provide, the better your AI prompts will be.</p>
+                <p className="text-gray-400">Start by defining the core emotion, then build your scene shot by shot. Drag and drop to reorder.</p>
+            </div>
+
+            <div className="bg-gray-900/50 p-6 rounded-lg">
+                <label htmlFor="emotional-core" className="block text-lg font-semibold text-indigo-300">Scene's Emotional Core (The 'Why')</label>
+                <p className="text-sm text-gray-400 mt-1 mb-3">Define the central subtext or emotional truth of this scene. This will guide all AI suggestions.</p>
+                <input 
+                    type="text"
+                    id="emotional-core"
+                    value={sceneEmotionalCore}
+                    onChange={(e) => setSceneEmotionalCore(e.target.value)}
+                    className="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-white"
+                    placeholder="e.g., A loving lesson in humility, a moment of quiet shame..."
+                />
             </div>
 
             <div className="space-y-4">
@@ -294,14 +314,14 @@ const ShotBuilder: React.FC<ShotBuilderProps> = ({ shots, setShots, story, direc
                             onEdit={() => handleEditShot(shot)} 
                             onDelete={() => handleDeleteShot(shot.id)}
                             onDragStart={(e) => handleDragStart(e, index)}
-                            onDragOver={(e) => e.preventDefault()}
-                            onDrop={(e) => handleDrop(e)}
+                            onDragOver={(e) => { e.preventDefault(); handleDragEnter(e, index); }}
+                            onDrop={handleDrop}
                             isDragging={isDragging && dragItem.current === index}
                         />
                     ))
                 ) : (
                     <div className="text-center py-12 px-6 bg-gray-900/50 rounded-lg">
-                        <p className="text-gray-400">Your scene is empty. Add a shot to begin.</p>
+                        <p className="text-gray-400">Your scene is empty. Add a shot or get AI suggestions to begin.</p>
                     </div>
                 )}
             </div>
@@ -310,7 +330,7 @@ const ShotBuilder: React.FC<ShotBuilderProps> = ({ shots, setShots, story, direc
                 <button onClick={handleAddShot} className="w-full sm:w-auto flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
                     <PlusIcon /> Add Shot Manually
                 </button>
-                <button onClick={handleGetSuggestions} disabled={isSuggesting} className="w-full sm:w-auto flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                <button onClick={handleGetSuggestions} disabled={isSuggesting || !sceneEmotionalCore} className="w-full sm:w-auto flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                     {isSuggesting ? (
                          <>
                          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

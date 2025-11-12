@@ -31,6 +31,7 @@ const App: React.FC = () => {
     inspirations: '',
   });
   const [shots, setShots] = useState<Shot[]>([]);
+  const [sceneEmotionalCore, setSceneEmotionalCore] = useState<string>('');
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
     { sender: 'gemini', text: "Hello! I'm your AI filmmaking assistant. Ask me anything about scriptwriting, cinematography, or for creative ideas." }
   ]);
@@ -43,7 +44,7 @@ const App: React.FC = () => {
       if (appMode === AppMode.CREATOR && step === AppStep.SCENE && shots.length === 0 && (story.title || story.logline)) {
         setIsInitializingScene(true);
         try {
-          const initialShots = await getInitialScene(story, directorVision);
+          const initialShots = await getInitialScene(story, directorVision, sceneEmotionalCore || "The opening of the story.");
           setShots(initialShots);
         } catch (error) {
           console.error("Failed to initialize scene:", error);
@@ -54,7 +55,7 @@ const App: React.FC = () => {
       }
     };
     initializeScene();
-  }, [step, appMode, story, directorVision]);
+  }, [step, appMode, story, directorVision, sceneEmotionalCore]);
 
   const handleNext = () => {
     if (step === AppStep.STORY) setStep(AppStep.VISION);
@@ -102,7 +103,17 @@ const App: React.FC = () => {
       case AppStep.VISION:
         return <DirectorVision vision={directorVision} setVision={setDirectorVision} onBack={handleBack} onNext={handleNext} />;
       case AppStep.SCENE:
-        return <ShotBuilder shots={shots} setShots={setShots} story={story} directorVision={directorVision} onBack={handleBack} onNext={handleNext} isInitializing={isInitializingScene} />;
+        return <ShotBuilder 
+                  shots={shots} 
+                  setShots={setShots} 
+                  story={story} 
+                  directorVision={directorVision} 
+                  onBack={handleBack} 
+                  onNext={handleNext} 
+                  isInitializing={isInitializingScene}
+                  sceneEmotionalCore={sceneEmotionalCore}
+                  setSceneEmotionalCore={setSceneEmotionalCore}
+                />;
       case AppStep.PROMPTS:
         return <PromptViewer shots={shots} story={story} onBack={handleBack} />;
       default:

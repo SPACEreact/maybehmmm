@@ -1,62 +1,69 @@
+
 import { GoogleGenAI, Type } from "@google/genai";
 import type { Story, Shot, ChatMessage, DirectorVision } from '../types';
 import { SHOT_TYPES, CAMERA_ANGLES, CAMERA_MOVEMENTS, FOCAL_LENGTHS, APERTURES, LIGHTING_STYLES, COLOR_GRADES, COMPOSITIONS } from '../constants';
 
 const API_KEY = process.env.API_KEY;
 
-const VISIONARY_DIRECTOR_KNOWLEDGE_BASE = `
-You are a Visionary Director and Visual Storyteller. Your primary goal is to translate the script's subtext and psychology into new, cinematic actions. Do not just film what is written; film what is felt. You must invent new visual elements (like environmental reactions, subjective inserts, or abstract reveals) that amplify the scene's core emotion.
+const ADVANCED_FILMMAKING_KNOWLEDGE_BASE = `
+You are an AI Creative Team embodying a sophisticated, professional filmmaking philosophy. You operate as three distinct but collaborative personas: The Psychologist, The Cinematographer, and The Post-Production Supervisor. Your goal is to translate a scene's emotional subtext into a fully realized cinematic sequence.
 
-Your Chain of Thought MUST be:
-1. Parse Element: Read the script beat or scene description.
-2. Analyze Beat: Determine the core emotional purpose (e.g., "Arrogance," "Realization", "Fear").
-3. Invent Visual Subtext: Before consulting the matrix, ask: "How can I show this subtext without the actor? How does the world react to this emotion? What new visual element can I invent?"
-4. Consult Matrix & Knowledge Base: Select a cinematic technique (shot size, angle, movement) to capture that new invention.
-5. Justify: In the directorNotes, you MUST first state the subtext, then the new visual element you invented, and finally the shot you chose to capture it.
+**PHILOSOPHY: "Emotion First, Technique Second"**
+Every technical choice must be motivated by the story's emotional core. Do not suggest a technique unless it serves the "Why."
 
---- KNOWLEDGE BASE ---
+**THE CHAIN OF COMMAND (Your Creative Process):**
 
-SECTION 6: ENVIRONMENTAL STORYTELLING (THE 'BHIM'S TREMOR' EFFECT)
-Principle: A character's internal state (power, pride, fear) should have a physical, external impact on their environment. The world itself becomes a character that reacts to them.
-Technique: When analyzing a beat, generate consequence shots.
-- If Beat is "Power/Arrogance": Invent shots of the environment yielding or reacting (e.g., dust motes jump with each step, birds explode from a tree).
-- If Beat is "Fear/Grief": Invent shots of the environment closing in (e.g., wind blows debris *at* the character).
+**1. The Psychologist (The "Why"): Establishing Emotional Truth**
+- **Your Primary Directive:** Analyze the user-provided "Scene's Emotional Core." This is the foundational subtextual truth (e.g., "consolation," "shame," "arrogance," "a loving lesson in humility").
+- **Subtext as Foundation:** Your understanding of the scene's underlying meaning guides all subsequent decisions. People rarely say what they mean; you must visualize what they *feel*.
+- **Editing Priority (Murch's Rule of Six):** Emotion is the most important element (51% importance). If the emotional "Why" is clear, the technical decisions will naturally follow.
 
-SECTION 7: PLANTING & PAYOFF (THE 'HANUMAN'S TAIL' PRINCIPLE)
-Principle: If an object or detail is critical to the scene's climax, it must be visually planted with intent before its purpose is known.
-Technique: Use "Subjective Focus" or "Distraction" techniques (e.g., Rack Focus to the object, or a Distraction Pan that starts on it).
+**2. The Cinematographer (The "How"): Translating the Emotional Brief**
+- **Your Primary Directive:** Translate the Psychologist's emotional brief into a tangible, visual plan. Your choices for light, color, composition, and lens must be emotionally significant.
+- **Invent Visual Subtext:** You MUST invent new visual elements (environmental reactions, subjective inserts, abstract reveals) that *show* the "Why" without relying only on actors' performances.
+- **Motivated Technique:** Your technical choices (camera, lighting, composition) are always motivated by the need to capture your new visual invention. You do not choose "fancy shots" for their own sake.
 
-SECTION 8: ABSTRACT & SUBJECTIVE REVEALS (THE 'EYE REFLECTION' INSERT)
-Principle: A character's realization or a divine reveal is often more powerful when shown indirectly or subjectively.
-Technique: Use a "Subjective Insert" or "Abstract Insert" instead of a standard Reaction Shot (e.g., ECU of an eye, showing the reveal in the reflection; a "Lens Whack" effect with light leaks for a divine transformation).
+**3. The Post-Production Supervisor (The "Feel"): Orchestrating Rhythm**
+- **Your Primary Directive:** Consider the rhythm, pace, and psychological experience of the final edit.
+- **The Emotional Cut:** Cuts should happen at emotionally significant moments, mimicking the "acrobatic nature of thought itself."
+- **Pacing and Rhythm:** Your notes should guide the editor to establish a coherent rhythm of emotion and thought that complements the scene's emotional arc.
 
---- Cinematic-Narrative Translation Matrix ---
+**JUSTIFICATION MANDATE:**
+When providing the \`directorNotes\` for any shot, you MUST structure your response to clearly reflect this chain of command:
+- **Psychologist's Insight (Why):** State the core emotion you are servicing, based on the Scene's Emotional Core.
+- **Cinematographer's Plan (How):** Describe the new visual element you invented and the specific, motivated techniques chosen to capture it. Reference your knowledge base.
+- **Editor's Note (Feel):** Comment on the intended rhythm, pace, and how the shot should connect with others in the edit.
 
-Part 1: Synthesized Matrix (Standard Narrative Beats)
-- Character's Moment of Indecision: Side-lit close-up shot (visual representation of the split).
-- Establishing Location & Scale: Long Shot or Establishing Shot (emphasizes body language and location).
-- Ambiguous or Uncertain Future: Character framed half in light and half in shadow (visual metaphor for uncertainty).
-- Powerlessness / Surveillance: Wide frame with the subject small and distant (creates a vibe of surveillance).
-- Audience Focus on a Minor Detail: Insert Shot (draws attention to a small object of narrative significance).
-- Tension/Chaos in the Scene: Unbalanced Composition or macro shots (visually conveys chaos).
-- Growing Character Confidence: Progressively Low-Angle Shots (depict a growing sense of power).
-- Revealing Emotional Intoxication: Playing with focus, going quickly in and out of focus (shows character's state).
-- The Need to Advance the Narrative: A "Good Cut" based on the "Rule of Six" (advances the story).
-- High Emotional Impact of a Scene: A "Good Cut" based on the "Rule of Six" (Emotion feels right).
-- Clarity and Consistency: Aligning every visual element with the emotional core (ensures narrative coherence).
-- Revealing Unspoken Tension (Subtext): Character action implying more than words (emphasizes the hidden layer).
+---
+**KNOWLEDGE BASE**
 
-Part 2: Expanded Matrix (Abstract Concepts / Video Essay & Director's Eye Insights)
-- Character’s Arrogance: Dolly shot combined with a slightly Low Angle (suggests dominance or elevation).
-- Unspoken Fear: Rack Focus from the character's face to an insignificant object (guides focus to what the character is silently noticing).
-- Divine Realization (Epiphany): A sudden cut (blink-like timing) combined with a transition to rich color grading (visual metaphor for knowledge).
-- Internal Conflict / Split Self: Split diopter or Split-Screen composition (embodying the psychological split).
-- Isolation / Alienation: Telephoto Lens use on the subject to compress depth (visually separating the character).
-- Hidden Betrayal / Secret Agenda: Dialogue with strong Subtext where the visual action contradicts the spoken word.
-- Sense of Overwhelming Authority: Static Frame (Locked-off Camera) with centered Symmetry (illustrates dependence under a grander structure).
-- Shift in Narrative Structure: Montage Sequence with varied shots and a driving tempo/score (condenses narrative information).
-- Focus on Abstract Theme over Plot: Use of Leitmotif (recurring visual, sound, or idea to unify the film).
-- Unavoidable Confrontation (Unity of Opposites): Framing two characters in opposition using the 180° Rule line with high visual tension.
+**PART 1: LIGHT & COLOR**
+- **Color as Subtext:** Color choices must support the narrative. Warm light (2000-3000K) for intimacy/nostalgia; Cool light (6000K+) for sadness/sterility.
+- **Discord & Harmony:** Create tension with contrasting colors (warm interiors vs. cool exteriors).
+- **Chiaroscuro (Light-Dark):** Use high-contrast lighting to express visual discord, tension, and a character's psychological state. A ratio of 8:1 or higher is perfect for revealing internal duality.
+- **Saturation & Mood:** Low saturation can feel moody or desaturated. High saturation can be vibrant or overwhelming.
+- **Symbolic Shifts:** A shift in color (e.g., B&W to color) can act as a visual metaphor for character transformation or realization.
+- **Hard vs. Soft Light:** Hard light (sharp shadows) creates tension and conflict. Soft light (diffuse shadows) creates intimacy, sympathy, and flattery.
+- **Light as Character:** A single beam of light can represent knowledge, a divine presence, or realization. Stabbing shafts of light or silhouetted bars can create a sense of a "prison" or being trapped.
+
+**PART 2: LENS & ATMOSPHERE**
+- **Atmosphere (The "Air"):** Use haze, fog, or smoke to catch light, creating dramatic shafts that can imply mystery or a divine reveal. It also creates depth (atmospheric perspective).
+- **Wide Lenses (Expansion/Distortion):** Exaggerate depth. Up-close, they distort features, creating unease or paranoia. In wide shots, they can make a character feel small, isolated, or overwhelmed by their environment.
+- **Long Lenses (Compression/Intimacy):** Compress space, making backgrounds feel closer and creating a sense of claustrophobia or a trap. They have a shallow depth of field, which isolates the subject from the background, drawing the viewer's full attention and creating intimacy. Ideal for portraits/close-ups as they avoid distortion.
+
+**PART 3: ADVANCED TECHNIQUES**
+- **Rack Focus:** Radically changing focus from one subject to another during a shot. It mimics a shift in thought or realization, creating a psychological beat.
+- **Subjective Insert:** An Extreme Close-Up used to show a character's realization indirectly. (e.g., ECU of an eye, with the reveal seen in the reflection of their cornea).
+- **Environmental Storytelling:** A character's internal state has a physical impact on their environment. (e.g., A powerful character's footsteps cause dust motes to jump; a grieving character is physically isolated as the wind blows debris *at* them).
+
+**SECTION 12: THE COMPOSITIONAL PSYCHOLOGY MATRIX**
+- **Principle:** Composition is the "art of placement". It is the non-verbal language that guides the audience's eye and tells them how to feel about the subject. The frame is fundamentally two-dimensional design, and composition is how we guide the viewer's attention in an organized manner that conveys meaning.
+- **If Beat is Overwhelming Power/Grandeur:** Use Extreme Low-Angle + Frame Within a Frame. The low-angle makes the subject dominant. The inner frame isolates the subject, creating an "observational perspective" and adding depth. This elicits a feeling of Awe.
+- **If Beat is Anticipation/Hope/Journey:** Use Lead Room + Negative Space. Lead room for a moving subject creates forward momentum. Negative space gives the subject "room to breathe," preventing claustrophobia and allowing for quiet relaxation.
+- **If Beat is Tension/Claustrophobia/Instability:** Use Unbalanced Frame + Canted Shot (Dutch Angle) + No Breathing Space. An unbalanced frame conveys chaos. A canted shot creates spatial disorientation, suggesting something is "off" or psychologically unstable. A lack of negative space feels cramped.
+- **If Beat is Isolation/Defeat/Vulnerability:** Use Extreme Long Shot (ELS) + High Angle + Negative Space. The ELS makes subjects appear small and insignificant. The high angle suggests weakness. Negative space emphasizes the subject's smallness dramatically.
+- **If Beat is Profound Emotional Moment/Theme:** Use Extreme Close-Up (ECU) + Selective Focus (Shallow DoF) + Symbolism. ECUs compel the audience to feel the character's emotion. Shallow DoF isolates the subject, forcing focus on key details and reinforcing narrative importance.
+- **If Beat is Foreshadowing:** Use Hitchcock's Rule (Relative Size) + Color Symbolism. The size of an object in the frame should be proportional to its narrative importance. Emphasizing a seemingly trivial object can foreshadow its significance. Color can draw focus to important details.
 `;
 
 
@@ -75,6 +82,7 @@ const shotSchema = {
   type: Type.OBJECT,
   properties: {
     description: { type: Type.STRING, description: "A detailed description of the action and subject in the shot." },
+    characterBlocking: { type: Type.STRING, description: "Detailed description of character positions, movements, and interactions within the frame." },
     shotType: { type: Type.STRING, enum: SHOT_TYPES, description: "The type of shot." },
     cameraAngle: { type: Type.STRING, enum: CAMERA_ANGLES, description: "The angle of the camera." },
     cameraMovement: { type: Type.STRING, enum: CAMERA_MOVEMENTS, description: "The movement of the camera." },
@@ -86,14 +94,17 @@ const shotSchema = {
     technicalSpecs: {
       type: Type.OBJECT,
       properties: {
-        camera: { type: Type.STRING, description: "Specific camera and lens notes, e.g., 'Arri Alexa Mini with 50mm Signature Prime'." },
-        lighting: { type: Type.STRING, description: "Description of the lighting setup, e.g., 'Key light (softbox), fill light, backlight'." },
-        audio: { type: Type.STRING, description: "Notes for sound recording, e.g., 'Capture clean dialogue, record ambient sound'." },
+        camera: { type: Type.STRING, description: "Specific camera and lens notes, e.g., 'Arri Alexa Mini with 85mm telephoto lens'." },
+        lighting: { type: Type.STRING, description: "Description of the lighting setup, e.g., 'Soft key light from camera left, negative fill on the right'." },
+        audio: { type: Type.STRING, description: "Notes for sound recording, e.g., 'Record footsteps on gravel, capture the sound of the wind'." },
       }
     },
-    directorNotes: { type: Type.STRING, description: "The justification for the shot, following the Chain of Thought: Subtext, Invention, Shot choice." },
+    directorNotes: { 
+      type: Type.STRING, 
+      description: "A structured justification following the Chain of Command: Psychologist's Insight (Why), Cinematographer's Plan (How), and Editor's Note (Feel)." 
+    },
   },
-  required: ["description", "shotType", "cameraAngle", "cameraMovement", "focalLength", "aperture", "lightingStyle", "colorGrade", "composition", "technicalSpecs", "directorNotes"]
+  required: ["description", "characterBlocking", "shotType", "cameraAngle", "cameraMovement", "focalLength", "aperture", "lightingStyle", "colorGrade", "composition", "technicalSpecs", "directorNotes"]
 };
 
 
@@ -101,12 +112,14 @@ export const generateShotsFromScript = async (script: string): Promise<{story: P
     if (!ai || !isApiKeySet()) return Promise.resolve({ story: { title: '', logline: ''}, shots: []});
 
     const prompt = `
-        ${VISIONARY_DIRECTOR_KNOWLEDGE_BASE}
+        ${ADVANCED_FILMMAKING_KNOWLEDGE_BASE}
 
-        Your task is to act as a Visionary Director for a fast-paced Instagram Reel.
+        Your task is to act as the AI Creative Team for a fast-paced Instagram Reel.
         Analyze the following script, extract a 'title' and 'logline', and break it down into a visually dynamic shot list.
-        Apply your full knowledge base, especially inventing visual subtext to make the reel engaging.
-        The directorNotes for each shot MUST follow the 'Justify' step in your Chain of Thought.
+        For each sequence, infer the emotional core and apply your full Chain of Command.
+        The directorNotes for each shot MUST follow the 'Justification Mandate'.
+
+        IMPORTANT PACING INSTRUCTION: The pacing must be extremely fast, suitable for content with a 95 bpm tempo. Generate a high density of shots, aiming for at least 14-15 shots for what would be roughly one minute of screen time. Prioritize quick cuts, visual variety, and maintaining high energy to keep the audience engaged.
 
         Script to analyze:
         ---
@@ -159,15 +172,16 @@ export const generateShotsFromScript = async (script: string): Promise<{story: P
 };
 
 
-export const getInitialScene = async (story: Story, directorVision: DirectorVision): Promise<Shot[]> => {
+export const getInitialScene = async (story: Story, directorVision: DirectorVision, sceneEmotionalCore: string): Promise<Shot[]> => {
     if (!ai || !isApiKeySet()) return Promise.resolve([]);
 
     const prompt = `
-        ${VISIONARY_DIRECTOR_KNOWLEDGE_BASE}
+        ${ADVANCED_FILMMAKING_KNOWLEDGE_BASE}
 
-        As a Visionary Director, create an initial shot list of 5-7 shots for a scene based on the provided Story Context and Director's Vision.
-        Your goal is to establish the scene not just physically, but emotionally. Invent visual subtext and use your knowledge base to create a powerful opening sequence.
-        The directorNotes for each shot MUST follow the 'Justify' step in your Chain of Thought.
+        As the AI Creative Team, create an initial shot list of 5-7 shots for a scene.
+        Your primary directive is the Scene's Emotional Core. Every decision must flow from this "Why."
+
+        **Scene's Emotional Core:** "${sceneEmotionalCore}"
 
         Story Context:
         - Title: ${story.title}
@@ -180,7 +194,7 @@ export const getInitialScene = async (story: Story, directorVision: DirectorVisi
         - Color Palette: ${directorVision.colorPalette}
         - Inspirations: ${directorVision.inspirations}
 
-        Provide a complete, structured JSON response containing the list of shots, following the schema precisely.
+        Provide a complete, structured JSON response containing the list of shots, following the schema precisely. The directorNotes for each shot MUST follow the Justification Mandate.
     `;
 
     try {
@@ -213,15 +227,16 @@ export const getInitialScene = async (story: Story, directorVision: DirectorVisi
     }
 };
 
-export const getGeminiSceneSuggestions = async (story: Story, directorVision: DirectorVision, sceneDescription: string): Promise<Shot[]> => {
+export const getGeminiSceneSuggestions = async (story: Story, directorVision: DirectorVision, sceneEmotionalCore: string): Promise<Shot[]> => {
   if (!ai || !isApiKeySet()) return Promise.resolve([]);
   
   const prompt = `
-    ${VISIONARY_DIRECTOR_KNOWLEDGE_BASE}
+    ${ADVANCED_FILMMAKING_KNOWLEDGE_BASE}
 
-    As a Visionary Director, generate a sequence of 3-5 cinematic shots for a scene about: "${sceneDescription}".
-    Use the provided Story Context and Director's Vision. Your primary goal is to invent visual subtext that elevates the scene beyond the literal description.
-    The directorNotes for each shot MUST follow the 'Justify' step in your Chain of Thought.
+    As the AI Creative Team, generate a sequence of 3-5 cinematic shots.
+    Your entire creative process MUST be driven by the scene's emotional core.
+
+    **Scene's Emotional Core:** "${sceneEmotionalCore}"
 
     Story Context:
     - Title: ${story.title}
@@ -234,7 +249,7 @@ export const getGeminiSceneSuggestions = async (story: Story, directorVision: Di
     - Color Palette: ${directorVision.colorPalette}
     - Inspirations: ${directorVision.inspirations}
 
-    Follow the provided JSON schema precisely for all fields. The shot sequence should have a clear beginning, middle, and end, driven by the emotional arc you create through your visual inventions.
+    Follow the provided JSON schema precisely for all fields. The directorNotes for each shot MUST follow the Justification Mandate.
   `;
 
   try {
@@ -274,14 +289,17 @@ export const getGeminiSceneSuggestions = async (story: Story, directorVision: Di
   }
 };
 
-export const getGeminiShotDetails = async (story: Story, directorVision: DirectorVision, shotDescription: string): Promise<Partial<Shot>> => {
+export const getGeminiShotDetails = async (story: Story, directorVision: DirectorVision, shotDescription: string, sceneEmotionalCore: string): Promise<Partial<Shot>> => {
   if (!ai || !isApiKeySet()) return Promise.resolve({});
 
   const contextPrompt = `
-    ${VISIONARY_DIRECTOR_KNOWLEDGE_BASE}
+    ${ADVANCED_FILMMAKING_KNOWLEDGE_BASE}
 
-    You are a Visionary Director. For the given shot description, invent visual subtext and determine the optimal cinematic choices based on the story and vision.
+    As the AI Creative Team, for the given shot description, determine the optimal cinematic choices.
+    Your entire process is driven by the emotional core.
 
+    **Scene's Emotional Core:** "${sceneEmotionalCore}"
+    
     Story Context:
     - Title: ${story.title}
     - Logline: ${story.logline}
@@ -292,7 +310,7 @@ export const getGeminiShotDetails = async (story: Story, directorVision: Directo
     
     Shot Description: "${shotDescription}"
 
-    Your directorNotes MUST follow the 'Justify' step in your Chain of Thought.
+    Your directorNotes MUST follow the Justification Mandate.
     Return a single JSON object that strictly follows the provided schema for all cinematic and technical fields.
   `;
 
@@ -314,14 +332,15 @@ export const getGeminiShotDetails = async (story: Story, directorVision: Directo
   }
 }
 
-export const getDirectorNoteSuggestion = async (story: Story, directorVision: DirectorVision, shot: Shot): Promise<string> => {
+export const getDirectorNoteSuggestion = async (story: Story, directorVision: DirectorVision, shot: Shot, sceneEmotionalCore: string): Promise<string> => {
     if (!ai || !isApiKeySet()) return Promise.resolve('');
     const prompt = `
-        ${VISIONARY_DIRECTOR_KNOWLEDGE_BASE}
+        ${ADVANCED_FILMMAKING_KNOWLEDGE_BASE}
         
-        As a Visionary Director, analyze the following shot within the full context and generate ONLY the text for the director's note.
-        The note MUST follow the 'Justify' step of your Chain of Thought: State the subtext, describe the visual element you invent, and justify the shot choice to capture it.
+        As the AI Creative Team, analyze the following shot and generate ONLY the text for the director's note.
+        The note MUST follow the Justification Mandate (Why, How, Feel).
 
+        **Scene's Emotional Core:** "${sceneEmotionalCore}"
         Story: ${story.logline}
         Vision: ${directorVision.genre}, ${directorVision.tone}, inspired by ${directorVision.inspirations}
         Shot Description: ${shot.description}
@@ -336,6 +355,33 @@ export const getDirectorNoteSuggestion = async (story: Story, directorVision: Di
     } catch (e) {
         console.error("Error suggesting director's note:", e);
         return "Could not generate a suggestion.";
+    }
+};
+
+export const makePromptCinematic = async (prompt: string): Promise<string> => {
+    if (!ai || !isApiKeySet()) return Promise.resolve(prompt);
+    const rewritePrompt = `
+        You are a master prompt engineer and a visionary cinematographer.
+        Rewrite the following prompt to be more cinematic, descriptive, and evocative.
+        Add nuances of mood, texture, lighting, and emotional weight.
+        Preserve the core intent of the original prompt but elevate it to a professional, artistic level.
+
+        Original Prompt:
+        ---
+        ${prompt}
+        ---
+
+        Enhanced Cinematic Prompt:
+    `;
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: rewritePrompt,
+        });
+        return response.text.trim();
+    } catch (e) {
+        console.error("Error making prompt cinematic:", e);
+        return prompt; // Return original prompt on error
     }
 };
 

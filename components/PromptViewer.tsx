@@ -1,6 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import type { Shot, Story } from '../types';
-import { CopyIcon, CameraIcon, VideoCameraIcon } from './Icon';
+import { CopyIcon, CameraIcon, VideoCameraIcon, MagicIcon } from './Icon';
+import { makePromptCinematic } from '../services/geminiService';
 
 interface PromptViewerProps {
   shots: Shot[];
@@ -13,6 +15,9 @@ type PromptType = 'image' | 'video';
 const generateImagePrompt = (story: Story, shot: Shot): string => {
   const parts = [];
   parts.push(shot.description);
+  if (shot.characterBlocking) {
+    parts.push(`Character blocking: ${shot.characterBlocking}.`);
+  }
   if (story.characters.length > 0) {
     const characterNames = story.characters.map(c => `${c.name} (${c.description})`).join(', ');
     parts.push(`featuring ${characterNames}.`);
@@ -38,6 +43,9 @@ const generateVideoPrompt = (story: Story, shot: Shot): string => {
     ? `${shot.cameraMovement} shot` 
     : shot.shotType;
   parts.push(`Video: ${movement} of ${shot.description}`);
+   if (shot.characterBlocking) {
+    parts.push(`Character blocking: ${shot.characterBlocking}.`);
+  }
   if (story.characters.length > 0) {
     const characterNames = story.characters.map(c => c.name).join(' and ');
     parts.push(`with ${characterNames}`);
@@ -53,7 +61,15 @@ const generateVideoPrompt = (story: Story, shot: Shot): string => {
   return parts.filter(p => p).join(', ');
 };
 
-const PromptCard: React.FC<{ prompt: string, index: number }> = ({ prompt, index }) => {
+const LoadingSpinner = () => (
+    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+);
+
+
+const PromptCard: React.FC<{ prompt: string, index: number, onMakeCinematic: (index: number) => void; isEnhancing: boolean }> = ({ prompt, index, onMakeCinematic, isEnhancing }) => {
     const [copied, setCopied] = useState(false);
 
     const handleCopy = () => {
@@ -69,12 +85,17 @@ const PromptCard: React.FC<{ prompt: string, index: number }> = ({ prompt, index
     }, [copied]);
 
     return (
-        <div className="bg-gray-900/50 p-5 rounded-lg">
+        <div className="bg-gray-900/50 p-5 rounded-lg transition-all duration-300">
             <div className="flex justify-between items-center mb-3">
                 <h4 className="font-bold text-lg text-indigo-300">Prompt #{index + 1}</h4>
-                <button onClick={handleCopy} className={`flex items-center gap-2 text-sm font-medium px-3 py-1 rounded-md transition-all ${copied ? 'bg-green-500 text-white' : 'bg-gray-700 hover:bg-gray-600 text-gray-300'}`}>
-                   <CopyIcon /> {copied ? 'Copied!' : 'Copy'}
-                </button>
+                <div className="flex items-center gap-2">
+                    <button onClick={() => onMakeCinematic(index)} disabled={isEnhancing} className={`flex items-center gap-2 text-sm font-medium px-3 py-1 rounded-md transition-all ${isEnhancing ? 'bg-purple-500/50 text-white cursor-not-allowed' : 'bg-purple-600 hover:bg-purple-700 text-white'}`}>
+                       {isEnhancing ? <LoadingSpinner /> : <MagicIcon />} {isEnhancing ? 'Enhancing...' : 'Make Cinematic'}
+                    </button>
+                    <button onClick={handleCopy} className={`flex items-center gap-2 text-sm font-medium px-3 py-1 rounded-md transition-all ${copied ? 'bg-green-500 text-white' : 'bg-gray-700 hover:bg-gray-600 text-gray-300'}`}>
+                       <CopyIcon /> {copied ? 'Copied!' : 'Copy'}
+                    </button>
+                </div>
             </div>
             <p className="text-gray-300 leading-relaxed font-mono text-sm">{prompt}</p>
         </div>
@@ -83,12 +104,38 @@ const PromptCard: React.FC<{ prompt: string, index: number }> = ({ prompt, index
 
 const PromptViewer: React.FC<PromptViewerProps> = ({ shots, story, onBack }) => {
   const [activeTab, setActiveTab] = useState<PromptType>('image');
+  const [prompts, setPrompts] = useState<string[]>([]);
+  const [isEnhancing, setIsEnhancing] = useState<number | null>(null);
+
+  useEffect(() => {
+    const generate = () => {
+        const generator = activeTab === 'image' ? generateImagePrompt : generateVideoPrompt;
+        setPrompts(shots.map(shot => generator(story, shot)));
+    };
+    generate();
+  }, [shots, story, activeTab]);
+
+  const handleMakeCinematic = async (index: number) => {
+    setIsEnhancing(index);
+    try {
+        const enhancedPrompt = await makePromptCinematic(prompts[index]);
+        const newPrompts = [...prompts];
+        newPrompts[index] = enhancedPrompt;
+        setPrompts(newPrompts);
+    } catch (error) {
+        console.error("Failed to make prompt cinematic:", error);
+        alert("There was an error enhancing your prompt. Please try again.");
+    } finally {
+        setIsEnhancing(null);
+    }
+  };
+
 
   return (
     <div className="space-y-8 animate-fade-in">
       <div>
         <h2 className="text-2xl font-bold text-gray-100 mb-4">Your Generated Prompts</h2>
-        <p className="text-gray-400">Here are the final prompts based on your story and scene design. Choose a tab and copy the prompts for your favorite AI generator.</p>
+        <p className="text-gray-400">Here are the final prompts based on your story and scene design. Choose a tab and copy the prompts, or use the magic wand to make them even more cinematic.</p>
       </div>
 
       <div className="border-b border-gray-700">
@@ -117,11 +164,14 @@ const PromptViewer: React.FC<PromptViewerProps> = ({ shots, story, onBack }) => 
       </div>
 
       <div className="space-y-6">
-        {activeTab === 'image' && shots.map((shot, index) => (
-          <PromptCard key={`${shot.id}-image`} prompt={generateImagePrompt(story, shot)} index={index} />
-        ))}
-         {activeTab === 'video' && shots.map((shot, index) => (
-          <PromptCard key={`${shot.id}-video`} prompt={generateVideoPrompt(story, shot)} index={index} />
+        {prompts.map((prompt, index) => (
+          <PromptCard 
+            key={`${shots[index].id}-${activeTab}-${index}`} 
+            prompt={prompt} 
+            index={index} 
+            onMakeCinematic={handleMakeCinematic}
+            isEnhancing={isEnhancing === index}
+          />
         ))}
       </div>
 
