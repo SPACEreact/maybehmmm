@@ -5,7 +5,7 @@ import { generateShotsFromScript } from '../services/geminiService';
 import { FilmIcon } from './Icon';
 
 interface ScriptProcessorProps {
-  onProcessComplete: (story: Pick<Story, 'title' | 'logline'>, shots: Shot[]) => void;
+  onProcessComplete: (story: Pick<Story, 'title' | 'logline'>, shots: Shot[], directorInstructions: string) => void;
 }
 
 const LoadingSpinner = () => (
@@ -18,6 +18,7 @@ const LoadingSpinner = () => (
 
 const ScriptProcessor: React.FC<ScriptProcessorProps> = ({ onProcessComplete }) => {
   const [script, setScript] = useState('');
+  const [directorInstructions, setDirectorInstructions] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async () => {
@@ -27,8 +28,8 @@ const ScriptProcessor: React.FC<ScriptProcessorProps> = ({ onProcessComplete }) 
     }
     setIsLoading(true);
     try {
-      const { story, shots } = await generateShotsFromScript(script);
-      onProcessComplete(story, shots);
+      const { story, shots } = await generateShotsFromScript(script, directorInstructions);
+      onProcessComplete(story, shots, directorInstructions);
     } catch (error) {
       console.error("Failed to process script:", error);
       alert("There was an error processing your script. Please check your API key and try again.");
@@ -60,9 +61,34 @@ const ScriptProcessor: React.FC<ScriptProcessorProps> = ({ onProcessComplete }) 
         <textarea
           value={script}
           onChange={(e) => setScript(e.target.value)}
-          placeholder="[SCENE START]\n\nINT. COFFEE SHOP - DAY\n\nJANE (30s) nervously stirs her coffee. ACROSS from her, MARK (30s) looks at his phone, oblivious.\n\nJANE\n(quietly)\nWe need to talk.\n\nMark looks up, annoyed.\n\nMARK\nAbout what?\n\n[SCENE END]"
+          placeholder="[SCENE START]
+
+INT. COFFEE SHOP - DAY
+
+JANE (30s) nervously stirs her coffee. ACROSS from her, MARK (30s) looks at his phone, oblivious.
+
+JANE
+(quietly)
+We need to talk.
+
+Mark looks up, annoyed.
+
+MARK
+About what?
+
+[SCENE END]"
           className="w-full h-64 p-4 bg-gray-900/50 rounded-lg text-gray-300 font-mono text-sm border border-gray-700 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition"
         />
+        <div className="mt-6">
+            <label htmlFor="director-instructions" className="block text-sm font-medium text-gray-300 mb-2">Director's Instructions (Optional)</label>
+            <textarea
+              id="director-instructions"
+              value={directorInstructions}
+              onChange={(e) => setDirectorInstructions(e.target.value)}
+              placeholder="e.g., 'Focus on extreme close-ups for emotional impact.' 'Use a lot of handheld camera work to create a sense of urgency.' 'The color palette should be cold and desaturated.'"
+              className="w-full h-24 p-4 bg-gray-900/50 rounded-lg text-gray-300 font-mono text-sm border border-gray-700 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition"
+            />
+        </div>
         <button
           onClick={handleSubmit}
           disabled={isLoading}

@@ -8,11 +8,12 @@ interface PromptViewerProps {
   shots: Shot[];
   story: Story;
   onBack: () => void;
+  directorInstructions?: string;
 }
 
 type PromptType = 'image' | 'video';
 
-const generateImagePrompt = (story: Story, shot: Shot): string => {
+const generateImagePrompt = (story: Story, shot: Shot, directorInstructions?: string): string => {
   const parts = [];
   parts.push(shot.description);
   if (shot.characterBlocking) {
@@ -33,11 +34,14 @@ const generateImagePrompt = (story: Story, shot: Shot): string => {
   if (shot.lightingStyle) parts.push(`Lighting is ${shot.lightingStyle.toLowerCase()}.`);
   if (shot.colorGrade) parts.push(`The color grade is ${shot.colorGrade}.`);
   if (shot.composition) parts.push(`Composition follows the ${shot.composition}.`);
+  if (directorInstructions) {
+    parts.push(`Director's instructions: ${directorInstructions}.`);
+  }
   parts.push('cinematic still, professional photograph, high detail, 8k.');
   return parts.filter(p => p).join(', ');
 };
 
-const generateVideoPrompt = (story: Story, shot: Shot): string => {
+const generateVideoPrompt = (story: Story, shot: Shot, directorInstructions?: string): string => {
   const parts = [];
   const movement = shot.cameraMovement && shot.cameraMovement !== "Static" 
     ? `${shot.cameraMovement} shot` 
@@ -57,6 +61,9 @@ const generateVideoPrompt = (story: Story, shot: Shot): string => {
   if (shot.lightingStyle) parts.push(`${shot.lightingStyle.toLowerCase()} lighting`);
   if (shot.colorGrade) parts.push(`with a ${shot.colorGrade.toLowerCase()} color grade`);
   if (shot.focalLength) parts.push(`using a ${shot.focalLength} lens`);
+  if (directorInstructions) {
+    parts.push(`Director's instructions: ${directorInstructions}.`);
+  }
   parts.push('cinematic video, motion picture, dynamic action, 4k, hyper detailed, film grain.');
   return parts.filter(p => p).join(', ');
 };
@@ -102,7 +109,7 @@ const PromptCard: React.FC<{ prompt: string, index: number, onMakeCinematic: (in
     );
 }
 
-const PromptViewer: React.FC<PromptViewerProps> = ({ shots, story, onBack }) => {
+const PromptViewer: React.FC<PromptViewerProps> = ({ shots, story, onBack, directorInstructions }) => {
   const [activeTab, setActiveTab] = useState<PromptType>('image');
   const [prompts, setPrompts] = useState<string[]>([]);
   const [isEnhancing, setIsEnhancing] = useState<number | null>(null);
@@ -110,10 +117,10 @@ const PromptViewer: React.FC<PromptViewerProps> = ({ shots, story, onBack }) => 
   useEffect(() => {
     const generate = () => {
         const generator = activeTab === 'image' ? generateImagePrompt : generateVideoPrompt;
-        setPrompts(shots.map(shot => generator(story, shot)));
+        setPrompts(shots.map(shot => generator(story, shot, directorInstructions)));
     };
     generate();
-  }, [shots, story, activeTab]);
+  }, [shots, story, activeTab, directorInstructions]);
 
   const handleMakeCinematic = async (index: number) => {
     setIsEnhancing(index);

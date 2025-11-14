@@ -39,6 +39,7 @@ const App: React.FC = () => {
   ]);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isBotThinking, setIsBotThinking] = useState(false);
+  const [directorInstructions, setDirectorInstructions] = useState('');
   const [isInitializingScene, setIsInitializingScene] = useState(false);
 
   useEffect(() => {
@@ -94,13 +95,14 @@ const App: React.FC = () => {
     }
   };
 
-  const handleScriptProcessComplete = (processedStory: Story, processedShots: Shot[]) => {
+  const handleScriptProcessComplete = (processedStory: Story, processedShots: Shot[], instructions: string) => {
     setStory({
       ...story,
       title: processedStory.title,
       logline: processedStory.logline,
     });
     setShots(processedShots);
+    setDirectorInstructions(instructions);
     // Skip story and vision steps, go directly to scene editing
     setStep(AppStep.SCENE);
     setAppMode(AppMode.CREATOR);
@@ -125,7 +127,7 @@ const App: React.FC = () => {
                   setSceneEmotionalCore={setSceneEmotionalCore}
                 />;
       case AppStep.PROMPTS:
-        return <PromptViewer shots={shots} story={story} onBack={handleBack} />;
+        return <PromptViewer shots={shots} story={story} onBack={handleBack} directorInstructions={directorInstructions} />;
       default:
         return <div>Invalid Step</div>;
     }

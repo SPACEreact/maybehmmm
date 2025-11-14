@@ -108,7 +108,7 @@ const shotSchema = {
 };
 
 
-export const generateShotsFromScript = async (script: string): Promise<{story: Pick<Story, 'title' | 'logline'>, shots: Shot[]}> => {
+export const generateShotsFromScript = async (script: string, directorInstructions: string): Promise<{story: Pick<Story, 'title' | 'logline'>, shots: Shot[]}> => {
     if (!ai || !isApiKeySet()) return Promise.resolve({ story: { title: '', logline: ''}, shots: []});
 
     const prompt = `
@@ -120,6 +120,14 @@ export const generateShotsFromScript = async (script: string): Promise<{story: P
         The directorNotes for each shot MUST follow the 'Justification Mandate'.
 
         IMPORTANT PACING INSTRUCTION: The pacing must be extremely fast, suitable for content with a 95 bpm tempo. Generate a high density of shots, aiming for at least 14-15 shots for what would be roughly one minute of screen time. Prioritize quick cuts, visual variety, and maintaining high energy to keep the audience engaged.
+
+        ${directorInstructions ? `
+        DIRECTOR'S INSTRUCTIONS:
+        ---
+        ${directorInstructions}
+        ---
+        The director's instructions are paramount. Ensure the generated shot list heavily reflects these creative guidelines.
+        ` : ''}
 
         Script to analyze:
         ---
@@ -453,7 +461,8 @@ export const generateChatResponse = async (history: ChatMessage[]): Promise<stri
     });
     return response.text;
   } catch (error) {
-    console.error("Error in chat response:", error);
+    // FIX: Combined the console.error arguments into a single template string to resolve the "Expected 0-1 arguments, but got 2" error.
+    console.error(`Error in chat response: ${error}`);
     throw new Error("Failed to get chat response.");
   }
 };
