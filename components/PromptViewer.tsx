@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import type { Shot, Story } from '../types';
 import { CopyIcon, CameraIcon, VideoCameraIcon, MagicIcon } from './Icon';
@@ -13,59 +12,69 @@ interface PromptViewerProps {
 
 type PromptType = 'image' | 'video';
 
+const sanitizeSegment = (segment: string): string => segment
+  .replace(/\s+/g, ' ')
+  .replace(/[\s,;.]+$/g, '')
+  .trim();
+
+const buildPrompt = (segments: Array<string | null | undefined | false>): string => {
+  const cleaned = segments
+    .map(segment => (segment ? sanitizeSegment(segment) : null))
+    .filter((segment): segment is string => Boolean(segment) && segment.length > 0);
+
+  const unique = [...new Set(cleaned)];
+
+  if (unique.length === 0) {
+    return '';
+  }
+  
+  const prompt = unique.join('. ');
+  return prompt.endsWith('.') ? prompt : `${prompt}.`;
+};
+
 const generateImagePrompt = (story: Story, shot: Shot, directorInstructions?: string): string => {
-  const parts = [];
-  parts.push(shot.description);
-  if (shot.characterBlocking) {
-    parts.push(`Character blocking: ${shot.characterBlocking}.`);
-  }
-  if (story.characters.length > 0) {
-    const characterNames = story.characters.map(c => `${c.name} (${c.description})`).join(', ');
-    parts.push(`featuring ${characterNames}.`);
-  }
-  if (story.setting.name) {
-    parts.push(`The scene is set in ${story.setting.name}, ${story.setting.description}.`);
-  }
-  if (shot.shotType) parts.push(shot.shotType);
-  if (shot.cameraAngle) parts.push(`${shot.cameraAngle} angle`);
-  if (shot.focalLength) parts.push(`shot on a ${shot.focalLength} lens`);
-  if (shot.aperture) parts.push(`with an aperture of ${shot.aperture} creating ${shot.aperture.includes('Shallow') ? 'a blurry background' : 'a sharp, deep focus'}.`);
-  if (shot.cameraMovement && shot.cameraMovement !== "Static") parts.push(`The camera movement is a ${shot.cameraMovement.toLowerCase()}.`);
-  if (shot.lightingStyle) parts.push(`Lighting is ${shot.lightingStyle.toLowerCase()}.`);
-  if (shot.colorGrade) parts.push(`The color grade is ${shot.colorGrade}.`);
-  if (shot.composition) parts.push(`Composition follows the ${shot.composition}.`);
-  if (directorInstructions) {
-    parts.push(`Director's instructions: ${directorInstructions}.`);
-  }
-  parts.push('cinematic still, professional photograph, high detail, 8k.');
-  return parts.filter(p => p).join(', ');
+  const characterDetails = story.characters.length > 0
+    ? story.characters.map(c => `${c.name} (${c.description})`).join(', ')
+    : '';
+
+  return buildPrompt([
+    shot.description,
+    shot.characterBlocking && `Character blocking focuses on ${shot.characterBlocking}`,
+    characterDetails && `Featuring ${characterDetails}`,
+    story.setting.name && `Set in ${story.setting.name}, which is ${story.setting.description}`,
+    shot.shotType && `Framed as a ${shot.shotType.toLowerCase()}`,
+    shot.cameraAngle && `Captured from a ${shot.cameraAngle.toLowerCase()} perspective`,
+    shot.focalLength && `Shot on a ${shot.focalLength} lens`,
+    shot.aperture && `Aperture set to ${shot.aperture.toLowerCase()}`,
+    shot.cameraMovement && shot.cameraMovement !== "Static" && `Subtle sense of ${shot.cameraMovement.toLowerCase()} energy`,
+    shot.lightingStyle && `${shot.lightingStyle} lighting creates the mood`,
+    shot.colorGrade && `Color grade leans toward ${shot.colorGrade.toLowerCase()}`,
+    shot.composition && `Composition follows the ${shot.composition.toLowerCase()}`,
+    directorInstructions && `Incorporate the director's notes: ${directorInstructions}`,
+    'Rendered as a cinematic still photograph with professional lighting, exquisite texture, and 8k clarity'
+  ]);
 };
 
 const generateVideoPrompt = (story: Story, shot: Shot, directorInstructions?: string): string => {
-  const parts = [];
-  const movement = shot.cameraMovement && shot.cameraMovement !== "Static" 
-    ? `${shot.cameraMovement} shot` 
-    : shot.shotType;
-  parts.push(`Video: ${movement} of ${shot.description}`);
-   if (shot.characterBlocking) {
-    parts.push(`Character blocking: ${shot.characterBlocking}.`);
-  }
-  if (story.characters.length > 0) {
-    const characterNames = story.characters.map(c => c.name).join(' and ');
-    parts.push(`with ${characterNames}`);
-  }
-  if (story.setting.name) {
-    parts.push(`in the setting of ${story.setting.name}`);
-  }
-  if (shot.cameraAngle) parts.push(`from a ${shot.cameraAngle.toLowerCase()}`);
-  if (shot.lightingStyle) parts.push(`${shot.lightingStyle.toLowerCase()} lighting`);
-  if (shot.colorGrade) parts.push(`with a ${shot.colorGrade.toLowerCase()} color grade`);
-  if (shot.focalLength) parts.push(`using a ${shot.focalLength} lens`);
-  if (directorInstructions) {
-    parts.push(`Director's instructions: ${directorInstructions}.`);
-  }
-  parts.push('cinematic video, motion picture, dynamic action, 4k, hyper detailed, film grain.');
-  return parts.filter(p => p).join(', ');
+  const hasMovement = shot.cameraMovement && shot.cameraMovement !== "Static";
+  const characterNames = story.characters.length > 0
+    ? story.characters.map(c => c.name).join(' and ')
+    : '';
+
+  return buildPrompt([
+    hasMovement
+      ? `${shot.cameraMovement?.toLowerCase()} camera move tracking ${shot.description}`
+      : `${shot.shotType ? shot.shotType.toLowerCase() : 'cinematic'} shot capturing ${shot.description}`,
+    shot.characterBlocking && `Character blocking emphasizes ${shot.characterBlocking}`,
+    characterNames && `Featuring ${characterNames}`,
+    story.setting.name && `Located in ${story.setting.name}, which is ${story.setting.description}`,
+    shot.cameraAngle && `Filmed from a ${shot.cameraAngle.toLowerCase()} angle`,
+    shot.lightingStyle && `${shot.lightingStyle.toLowerCase()} lighting defines the atmosphere`,
+    shot.colorGrade && `Finished with a ${shot.colorGrade.toLowerCase()} color grade`,
+    shot.focalLength && `Captured using a ${shot.focalLength} lens`,
+    directorInstructions && `Honor the director's notes: ${directorInstructions}`,
+    'Deliver as cinematic motion footage in 4K with dynamic action and refined film grain'
+  ]);
 };
 
 const LoadingSpinner = () => (
