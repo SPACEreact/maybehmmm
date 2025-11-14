@@ -3,6 +3,7 @@ export enum AppStep {
   STORY,
   VISION,
   SCENE,
+  SOUNDSCAPE,
   PROMPTS,
 }
 
@@ -60,3 +61,12 @@ export interface ChatMessage {
   sender: 'user' | 'gemini';
   text: string;
 }
+
+export interface ShotSoundDesign {
+  shotId: string;
+  score: string;
+  sfx: string;
+  ambience: string;
+}
+
+export type Soundscape = ShotSoundDesign[];

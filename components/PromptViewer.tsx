@@ -1,11 +1,13 @@
+
 import React, { useState, useEffect } from 'react';
-import type { Shot, Story } from '../types';
+import type { Shot, Story, Soundscape, ShotSoundDesign } from '../types';
 import { CopyIcon, CameraIcon, VideoCameraIcon, MagicIcon } from './Icon';
 import { makePromptCinematic } from '../services/geminiService';
 
 interface PromptViewerProps {
   shots: Shot[];
   story: Story;
+  soundscape: Soundscape;
   onBack: () => void;
   directorInstructions?: string;
 }
@@ -35,6 +37,7 @@ const buildPrompt = (segments: Array<string | null | undefined | false>): string
 const generateImagePrompt = (story: Story, shot: Shot, directorInstructions?: string): string => {
   const characterDetails = story.characters.length > 0
     ? story.characters.map(c => `${c.name} (${c.description})`).join(', ')
+    // eslint-disable-next-line indent
     : '';
 
   return buildPrompt([
@@ -55,7 +58,7 @@ const generateImagePrompt = (story: Story, shot: Shot, directorInstructions?: st
   ]);
 };
 
-const generateVideoPrompt = (story: Story, shot: Shot, directorInstructions?: string): string => {
+const generateVideoPrompt = (story: Story, shot: Shot, soundDesign: ShotSoundDesign | undefined, directorInstructions?: string): string => {
   const hasMovement = shot.cameraMovement && shot.cameraMovement !== "Static";
   const characterNames = story.characters.length > 0
     ? story.characters.map(c => c.name).join(' and ')
@@ -72,6 +75,7 @@ const generateVideoPrompt = (story: Story, shot: Shot, directorInstructions?: st
     shot.lightingStyle && `${shot.lightingStyle.toLowerCase()} lighting defines the atmosphere`,
     shot.colorGrade && `Finished with a ${shot.colorGrade.toLowerCase()} color grade`,
     shot.focalLength && `Captured using a ${shot.focalLength} lens`,
+    soundDesign?.sfx && `Key sound effect: ${soundDesign.sfx}`,
     directorInstructions && `Honor the director's notes: ${directorInstructions}`,
     'Deliver as cinematic motion footage in 4K with dynamic action and refined film grain'
   ]);
@@ -118,18 +122,24 @@ const PromptCard: React.FC<{ prompt: string, index: number, onMakeCinematic: (in
     );
 }
 
-const PromptViewer: React.FC<PromptViewerProps> = ({ shots, story, onBack, directorInstructions }) => {
+const PromptViewer: React.FC<PromptViewerProps> = ({ shots, story, soundscape, onBack, directorInstructions }) => {
   const [activeTab, setActiveTab] = useState<PromptType>('image');
   const [prompts, setPrompts] = useState<string[]>([]);
   const [isEnhancing, setIsEnhancing] = useState<number | null>(null);
 
   useEffect(() => {
     const generate = () => {
-        const generator = activeTab === 'image' ? generateImagePrompt : generateVideoPrompt;
-        setPrompts(shots.map(shot => generator(story, shot, directorInstructions)));
+        if (activeTab === 'image') {
+          setPrompts(shots.map(shot => generateImagePrompt(story, shot, directorInstructions)));
+        } else {
+          setPrompts(shots.map(shot => {
+            const shotSoundDesign = soundscape.find(s => s.shotId === shot.id);
+            return generateVideoPrompt(story, shot, shotSoundDesign, directorInstructions);
+          }));
+        }
     };
     generate();
-  }, [shots, story, activeTab, directorInstructions]);
+  }, [shots, story, soundscape, activeTab, directorInstructions]);
 
   const handleMakeCinematic = async (index: number) => {
     setIsEnhancing(index);
@@ -193,7 +203,7 @@ const PromptViewer: React.FC<PromptViewerProps> = ({ shots, story, onBack, direc
 
       <div className="flex justify-start pt-8 mt-4 border-t border-gray-700">
         <button onClick={onBack} className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
-          &larr; Back to Scene
+          &larr; Back to Soundscape
         </button>
       </div>
     </div>

@@ -1,16 +1,17 @@
 
 import React, { useState, useEffect } from 'react';
 // FIX: Aliased the DirectorVision type to resolve a name conflict with the DirectorVision component.
-import type { Story, Shot, ChatMessage, DirectorVision as DirectorVisionType } from './types';
+import type { Story, Shot, ChatMessage, Soundscape, DirectorVision as DirectorVisionType } from './types';
 import { AppStep, AppMode } from './types';
 import StoryBuilder from './components/StoryBuilder';
 import DirectorVision from './components/DirectorVision';
 import ShotBuilder from './components/ShotBuilder';
+import SoundscapeBuilder from './components/SoundscapeBuilder';
 import PromptViewer from './components/PromptViewer';
 import Chatbot from './components/Chatbot';
 import StartScreen from './components/StartScreen';
 import ScriptProcessor from './components/ScriptProcessor';
-import { CameraIcon, FilmIcon, SparklesIcon, ChatIcon, ClipboardListIcon, HeartIcon } from './components/Icon';
+import { CameraIcon, FilmIcon, SparklesIcon, ChatIcon, ClipboardListIcon, HeartIcon, SpeakerIcon } from './components/Icon';
 import { generateChatResponse, getInitialScene } from './services/geminiService';
 
 
@@ -33,6 +34,7 @@ const App: React.FC = () => {
     inspirations: '',
   });
   const [shots, setShots] = useState<Shot[]>([]);
+  const [soundscape, setSoundscape] = useState<Soundscape>([]);
   const [sceneEmotionalCore, setSceneEmotionalCore] = useState<string>('');
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
     { sender: 'gemini', text: "Hello! I'm your AI filmmaking assistant. Ask me anything about scriptwriting, cinematography, or for creative ideas." }
@@ -71,11 +73,13 @@ const App: React.FC = () => {
   const handleNext = () => {
     if (step === AppStep.STORY) setStep(AppStep.VISION);
     if (step === AppStep.VISION) setStep(AppStep.SCENE);
-    if (step === AppStep.SCENE) setStep(AppStep.PROMPTS);
+    if (step === AppStep.SCENE) setStep(AppStep.SOUNDSCAPE);
+    if (step === AppStep.SOUNDSCAPE) setStep(AppStep.PROMPTS);
   };
 
   const handleBack = () => {
-    if (step === AppStep.PROMPTS) setStep(AppStep.SCENE);
+    if (step === AppStep.PROMPTS) setStep(AppStep.SOUNDSCAPE);
+    if (step === AppStep.SOUNDSCAPE) setStep(AppStep.SCENE);
     if (step === AppStep.SCENE) setStep(AppStep.VISION);
     if (step === AppStep.VISION) setStep(AppStep.STORY);
   };
@@ -126,8 +130,18 @@ const App: React.FC = () => {
                   sceneEmotionalCore={sceneEmotionalCore}
                   setSceneEmotionalCore={setSceneEmotionalCore}
                 />;
+      case AppStep.SOUNDSCAPE:
+        return <SoundscapeBuilder 
+                  shots={shots}
+                  story={story}
+                  directorVision={directorVision}
+                  soundscape={soundscape}
+                  setSoundscape={setSoundscape}
+                  onBack={handleBack}
+                  onNext={handleNext}
+                />;
       case AppStep.PROMPTS:
-        return <PromptViewer shots={shots} story={story} onBack={handleBack} directorInstructions={directorInstructions} />;
+        return <PromptViewer shots={shots} story={story} soundscape={soundscape} onBack={handleBack} directorInstructions={directorInstructions} />;
       default:
         return <div>Invalid Step</div>;
     }
@@ -137,6 +151,7 @@ const App: React.FC = () => {
       { id: AppStep.STORY, name: 'The Story', icon: <SparklesIcon />},
       { id: AppStep.VISION, name: "Director's Vision", icon: <ClipboardListIcon />},
       { id: AppStep.SCENE, name: 'The Scene', icon: <CameraIcon />},
+      { id: AppStep.SOUNDSCAPE, name: 'The Soundscape', icon: <SpeakerIcon />},
       { id: AppStep.PROMPTS, name: 'The Prompts', icon: <FilmIcon />},
   ];
   

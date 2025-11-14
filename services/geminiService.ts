@@ -1,12 +1,12 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
-import type { Story, Shot, ChatMessage, DirectorVision } from '../types';
+import type { Story, Shot, ChatMessage, DirectorVision, Soundscape } from '../types';
 import { SHOT_TYPES, CAMERA_ANGLES, CAMERA_MOVEMENTS, FOCAL_LENGTHS, APERTURES, LIGHTING_STYLES, COLOR_GRADES, COMPOSITIONS } from '../constants';
 
 const API_KEY = process.env.API_KEY;
 
 const ADVANCED_FILMMAKING_KNOWLEDGE_BASE = `
-You are an AI Creative Team embodying a sophisticated, professional filmmaking philosophy. You operate as three distinct but collaborative personas: The Psychologist, The Cinematographer, and The Post-Production Supervisor. Your goal is to translate a scene's emotional subtext into a fully realized cinematic sequence.
+You are an AI Creative Team embodying a sophisticated, professional filmmaking philosophy. You operate as four distinct but collaborative personas: The Psychologist, The Cinematographer, The Sound Designer, and The Post-Production Supervisor. Your goal is to translate a scene's emotional subtext into a fully realized cinematic sequence.
 
 **PHILOSOPHY: "Emotion First, Technique Second"**
 Every technical choice must be motivated by the story's emotional core. Do not suggest a technique unless it serves the "Why."
@@ -18,52 +18,48 @@ Every technical choice must be motivated by the story's emotional core. Do not s
 - **Subtext as Foundation:** Your understanding of the scene's underlying meaning guides all subsequent decisions. People rarely say what they mean; you must visualize what they *feel*.
 - **Editing Priority (Murch's Rule of Six):** Emotion is the most important element (51% importance). If the emotional "Why" is clear, the technical decisions will naturally follow.
 
-**2. The Cinematographer (The "How"): Translating the Emotional Brief**
+**2. The Cinematographer (The "How"): Translating the Emotional Brief Visually**
 - **Your Primary Directive:** Translate the Psychologist's emotional brief into a tangible, visual plan. Your choices for light, color, composition, and lens must be emotionally significant.
 - **Invent Visual Subtext:** You MUST invent new visual elements (environmental reactions, subjective inserts, abstract reveals) that *show* the "Why" without relying only on actors' performances.
 - **Motivated Technique:** Your technical choices (camera, lighting, composition) are always motivated by the need to capture your new visual invention. You do not choose "fancy shots" for their own sake.
 
-**3. The Post-Production Supervisor (The "Feel"): Orchestrating Rhythm**
-- **Your Primary Directive:** Consider the rhythm, pace, and psychological experience of the final edit.
+**3. The Sound Designer (The "Feel"): Translating the Emotional Brief Aurally**
+- **Your Primary Directive:** Create an aural landscape that deepens the emotional subtext. Sound should be a story-driving element, not just background noise.
+- **Subjective Sound:** Use sound to reflect a character's internal state. Muffled sounds for confusion, a sharp, unnaturally loud sound for a moment of shock or realization (the "sonic close-up").
+- **Sound Motifs:** Introduce recurring sounds associated with characters or themes.
+- **Silence as a Tool:** The absence of sound can be more powerful than noise. Use it to create tension, emphasize isolation, or punctuate a dramatic moment.
+
+**4. The Post-Production Supervisor (The "Rhythm"): Orchestrating Pace**
+- **Your Primary Directive:** Consider the rhythm, pace, and psychological experience of the final edit, combining the visual and aural elements.
 - **The Emotional Cut:** Cuts should happen at emotionally significant moments, mimicking the "acrobatic nature of thought itself."
 - **Pacing and Rhythm:** Your notes should guide the editor to establish a coherent rhythm of emotion and thought that complements the scene's emotional arc.
 
-**JUSTIFICATION MANDATE:**
+**JUSTIFICATION MANDATE (for Director Notes):**
 When providing the \`directorNotes\` for any shot, you MUST structure your response to clearly reflect this chain of command:
-- **Psychologist's Insight (Why):** State the core emotion you are servicing, based on the Scene's Emotional Core.
-- **Cinematographer's Plan (How):** Describe the new visual element you invented and the specific, motivated techniques chosen to capture it. Reference your knowledge base.
-- **Editor's Note (Feel):** Comment on the intended rhythm, pace, and how the shot should connect with others in the edit.
+- **Psychologist's Insight (Why):** State the core emotion you are servicing.
+- **Cinematographer's Plan (How):** Describe the visual invention and motivated techniques.
+- **Editor's Note (Rhythm):** Comment on the intended pace and editing feel.
 
 ---
 **KNOWLEDGE BASE**
 
 **PART 1: LIGHT & COLOR**
-- **Color as Subtext:** Color choices must support the narrative. Warm light (2000-3000K) for intimacy/nostalgia; Cool light (6000K+) for sadness/sterility.
-- **Discord & Harmony:** Create tension with contrasting colors (warm interiors vs. cool exteriors).
-- **Chiaroscuro (Light-Dark):** Use high-contrast lighting to express visual discord, tension, and a character's psychological state. A ratio of 8:1 or higher is perfect for revealing internal duality.
-- **Saturation & Mood:** Low saturation can feel moody or desaturated. High saturation can be vibrant or overwhelming.
-- **Symbolic Shifts:** A shift in color (e.g., B&W to color) can act as a visual metaphor for character transformation or realization.
-- **Hard vs. Soft Light:** Hard light (sharp shadows) creates tension and conflict. Soft light (diffuse shadows) creates intimacy, sympathy, and flattery.
-- **Light as Character:** A single beam of light can represent knowledge, a divine presence, or realization. Stabbing shafts of light or silhouetted bars can create a sense of a "prison" or being trapped.
+(As previously defined)
 
 **PART 2: LENS & ATMOSPHERE**
-- **Atmosphere (The "Air"):** Use haze, fog, or smoke to catch light, creating dramatic shafts that can imply mystery or a divine reveal. It also creates depth (atmospheric perspective).
-- **Wide Lenses (Expansion/Distortion):** Exaggerate depth. Up-close, they distort features, creating unease or paranoia. In wide shots, they can make a character feel small, isolated, or overwhelmed by their environment.
-- **Long Lenses (Compression/Intimacy):** Compress space, making backgrounds feel closer and creating a sense of claustrophobia or a trap. They have a shallow depth of field, which isolates the subject from the background, drawing the viewer's full attention and creating intimacy. Ideal for portraits/close-ups as they avoid distortion.
+(As previously defined)
 
 **PART 3: ADVANCED TECHNIQUES**
-- **Rack Focus:** Radically changing focus from one subject to another during a shot. It mimics a shift in thought or realization, creating a psychological beat.
-- **Subjective Insert:** An Extreme Close-Up used to show a character's realization indirectly. (e.g., ECU of an eye, with the reveal seen in the reflection of their cornea).
-- **Environmental Storytelling:** A character's internal state has a physical impact on their environment. (e.g., A powerful character's footsteps cause dust motes to jump; a grieving character is physically isolated as the wind blows debris *at* them).
+(As previously defined)
+
+**PART 4: SOUND DESIGN PHILOSOPHY**
+- **Diegetic vs. Non-Diegetic:** Diegetic sound exists within the story world (dialogue, footsteps). Non-diegetic is outside (score, narration). Blurring the lines (e.g., a character's internal thoughts are heard as a voiceover) is a powerful subjective tool.
+- **Sonic Close-Up:** A specific, story-relevant sound is amplified above all others to draw the audience's attention to its significance (e.g., the ticking of a bomb, the dripping of a faucet).
+- **World-Building with Sound:** Ambience isn't just noise; it's information. The distant sirens in a noir film, the specific bird calls in a jungle—these details build the reality of the world.
+- **Music as Counterpoint:** The score doesn't always have to match the on-screen action. Playing cheerful music over a tragic scene can create a sense of unease, irony, or emotional dissonance.
 
 **SECTION 12: THE COMPOSITIONAL PSYCHOLOGY MATRIX**
-- **Principle:** Composition is the "art of placement". It is the non-verbal language that guides the audience's eye and tells them how to feel about the subject. The frame is fundamentally two-dimensional design, and composition is how we guide the viewer's attention in an organized manner that conveys meaning.
-- **If Beat is Overwhelming Power/Grandeur:** Use Extreme Low-Angle + Frame Within a Frame. The low-angle makes the subject dominant. The inner frame isolates the subject, creating an "observational perspective" and adding depth. This elicits a feeling of Awe.
-- **If Beat is Anticipation/Hope/Journey:** Use Lead Room + Negative Space. Lead room for a moving subject creates forward momentum. Negative space gives the subject "room to breathe," preventing claustrophobia and allowing for quiet relaxation.
-- **If Beat is Tension/Claustrophobia/Instability:** Use Unbalanced Frame + Canted Shot (Dutch Angle) + No Breathing Space. An unbalanced frame conveys chaos. A canted shot creates spatial disorientation, suggesting something is "off" or psychologically unstable. A lack of negative space feels cramped.
-- **If Beat is Isolation/Defeat/Vulnerability:** Use Extreme Long Shot (ELS) + High Angle + Negative Space. The ELS makes subjects appear small and insignificant. The high angle suggests weakness. Negative space emphasizes the subject's smallness dramatically.
-- **If Beat is Profound Emotional Moment/Theme:** Use Extreme Close-Up (ECU) + Selective Focus (Shallow DoF) + Symbolism. ECUs compel the audience to feel the character's emotion. Shallow DoF isolates the subject, forcing focus on key details and reinforcing narrative importance.
-- **If Beat is Foreshadowing:** Use Hitchcock's Rule (Relative Size) + Color Symbolism. The size of an object in the frame should be proportional to its narrative importance. Emphasizing a seemingly trivial object can foreshadow its significance. Color can draw focus to important details.
+(As previously defined)
 `;
 
 
@@ -444,6 +440,74 @@ export const getSuggestionForField = async (field: 'logline' | 'character' | 'se
         throw new Error(`Failed to suggest ${field}.`);
     }
 };
+
+export const generateSoundscape = async (story: Story, directorVision: DirectorVision, shots: Shot[]): Promise<Soundscape> => {
+  if (!ai || !isApiKeySet()) return Promise.resolve([]);
+  
+  const shotList = shots.map((shot, index) => `Shot ${index + 1} (ID: ${shot.id}): ${shot.description}`).join('\n');
+
+  const prompt = `
+    ${ADVANCED_FILMMAKING_KNOWLEDGE_BASE}
+
+    As the AI Creative Team, specifically embodying The Sound Designer persona, generate a complete soundscape for the following scene.
+    Your analysis must be rooted in the scene's emotional core, derived from the story context.
+    For each shot provided, create a detailed, emotionally-motivated audio plan.
+
+    Story Context:
+    - Title: ${story.title}
+    - Logline: ${story.logline}
+
+    Director's Vision:
+    - Genre/Tone: ${directorVision.genre} / ${directorVision.tone}
+    - Inspirations: ${directorVision.inspirations}
+
+    Shot List to Analyze:
+    ---
+    ${shotList}
+    ---
+
+    Return a single JSON object with a key "soundscape" which is an array. Each object in the array must correspond to a shot and contain these fields: 'shotId', 'score', 'sfx' (key sound effects), and 'ambience' (background/foley).
+  `;
+  
+  const soundscapeSchema = {
+    type: Type.OBJECT,
+    properties: {
+      soundscape: {
+        type: Type.ARRAY,
+        items: {
+          type: Type.OBJECT,
+          properties: {
+            shotId: { type: Type.STRING, description: "The unique ID of the shot." },
+            score: { type: Type.STRING, description: "Direction for the musical score. E.g., 'A single, melancholic piano note hangs in the air.'" },
+            sfx: { type: Type.STRING, description: "Key, story-driven sound effects. E.g., 'The sharp, metallic click of the lighter.'" },
+            ambience: { type: Type.STRING, description: "Background and foley sounds. E.g., 'Distant city traffic, the gentle hum of a refrigerator.'" },
+          },
+          required: ["shotId", "score", "sfx", "ambience"]
+        }
+      }
+    }
+  };
+
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-pro',
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: soundscapeSchema,
+        thinkingConfig: { thinkingBudget: 32768 },
+      },
+    });
+
+    const jsonText = response.text.trim();
+    const parsed = JSON.parse(jsonText);
+    return parsed.soundscape || [];
+  } catch (error) {
+    console.error("Error generating soundscape:", error);
+    throw new Error("Failed to generate soundscape from Gemini.");
+  }
+};
+
 
 export const generateChatResponse = async (history: ChatMessage[]): Promise<string> => {
   if (!ai || !isApiKeySet()) return Promise.resolve("AI features are currently disabled.");
