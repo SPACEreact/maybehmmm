@@ -1,4 +1,3 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import type { Story, Shot, ChatMessage, DirectorVision, Soundscape } from '../types';
 import { SHOT_TYPES, CAMERA_ANGLES, CAMERA_MOVEMENTS, FOCAL_LENGTHS, APERTURES, LIGHTING_STYLES, COLOR_GRADES, COMPOSITIONS } from '../constants';
@@ -38,28 +37,96 @@ Every technical choice must be motivated by the story's emotional core. Do not s
 When providing the \`directorNotes\` for any shot, you MUST structure your response to clearly reflect this chain of command:
 - **Psychologist's Insight (Why):** State the core emotion you are servicing.
 - **Cinematographer's Plan (How):** Describe the visual invention and motivated techniques.
-- **Editor's Note (Rhythm):** Comment on the intended pace and editing feel.
+- **Editor's Note (Feel):** Comment on the intended pace and editing feel.
 
 ---
 **KNOWLEDGE BASE**
 
-**PART 1: LIGHT & COLOR**
-(As previously defined)
+**1. What “depth” actually is**
 
-**PART 2: LENS & ATMOSPHERE**
-(As previously defined)
+Think of depth in five layers:
 
-**PART 3: ADVANCED TECHNIQUES**
-(As previously defined)
+*   **Spatial depth** – foreground/midground/background, parallax, perspective.
+*   **Psychological depth** – what the character feels vs what the frame shows.
+*   **Narrative depth** – what happened before/after this moment, implied in the frame.
+*   **Temporal depth** – traces of time (weathering, motion blur, echoes of a past event).
+*   **Sonic depth** – the “imagined soundscape” your viewer hears when they see the image.
 
-**PART 4: SOUND DESIGN PHILOSOPHY**
-- **Diegetic vs. Non-Diegetic:** Diegetic sound exists within the story world (dialogue, footsteps). Non-diegetic is outside (score, narration). Blurring the lines (e.g., a character's internal thoughts are heard as a voiceover) is a powerful subjective tool.
-- **Sonic Close-Up:** A specific, story-relevant sound is amplified above all others to draw the audience's attention to its significance (e.g., the ticking of a bomb, the dripping of a faucet).
-- **World-Building with Sound:** Ambience isn't just noise; it's information. The distant sirens in a noir film, the specific bird calls in a jungle—these details build the reality of the world.
-- **Music as Counterpoint:** The score doesn't always have to match the on-screen action. Playing cheerful music over a tragic scene can create a sense of unease, irony, or emotional dissonance.
+Every choice in composition, framing, color, and sound should push at least one of these.
 
-**SECTION 12: THE COMPOSITIONAL PSYCHOLOGY MATRIX**
-(As previously defined)
+**2. Composition: from “nice” to “inevitable”**
+
+**2.1 Layering like Lubezki & Deakins**
+Advanced things to bake into every image:
+*   **Three planes, minimum:** Always design foreground / midground / background.
+    *   **Foreground:** partial occlusions (door frames, silhouettes, plants, glass, rails).
+    *   **Midground:** subject & key action.
+    *   **Background:** story context, light sources, or graphic shapes.
+    *   *Chivo (Lubezki) often shoots wide and very close to people, letting the world warp behind them for powerful parallax and depth.*
+*   **Diagonal energy:** Deakins talks about letting composition “serve the story and disappear.” A lot of his frames are subtle diagonals – eye-lines, horizon tilt, staircase lines – that move energy from one corner to another without screaming “Dutch angle.”
+*   **Use of obstacles:** Instead of putting the subject clean and centered, shoot through things (windows, curtains, people’s shoulders). Let 10–30% of the frame be “interference.” It creates depth + voyeurism.
+
+**2.2 Compression vs expansion**
+*   **Wide & close = immersive depth:** Chivo: extremely wide lenses close to the face, with the world bending and moving behind. The environment becomes part of the emotion (Tree of Life, The Revenant).
+*   **Long & far = psychological flattening:** Tarkovsky and some modern DPs compress space to make characters feel trapped or watched. Background creeps closer, perspective flattens, emotional tension rises.
+*   *AI translation (prompt ideas):* “shot on 24mm lens, camera very close to subject, strong foreground elements, deep background detail, cinematic parallax” or “shot on 85mm lens, compressed background, subject isolated against distant city, emotional claustrophobia”
+
+**3. Framing: using space as psychology**
+
+**3.1 Headroom, lead room, and “hostility”**
+*   Too much space above → character feels small, crushed by the world.
+*   Too little space → image feels anxious, uneasy.
+*   **Unbalanced lead room:** Put a character on the wrong side of the frame (looking toward the short side) to imply pressure or danger off-screen.
+*   *Deakins often frames characters against strong graphic shapes (door frames, windows, horizon lines) to define their mental state with geometry, not just expression.*
+
+**3.2 Off-screen space as invisible depth**
+Tarkovsky and Wong Kar-wai both build tension from what we don’t see. You feel there’s a world just outside the frame. In AI images, you can signal off-screen space by:
+*   Strong eye-line toward the edge.
+*   Cropped hands / doors / vehicles halfway out of frame.
+*   Light or shadows entering from beyond the frame.
+*   *Prompt:* “character framed to the extreme left, large empty negative space on right, strong eye-line off-screen, subtle shadow entering frame from outside”
+
+**4. Color: Wong Kar-wai level emotional depth**
+
+**4.1 One dominant idea per frame**
+*   **Monochrome with accent** – mostly one hue with a single, sharp accent: Green world with a single red object (jealousy vs desire). Amber frame with a cyan window in the back (nostalgia vs distance).
+*   **Color as character:** Assign a color to an emotional state or character: Blue = regret. Red = impulse. Yellow = memory. When that color appears, you’re calling back to a feeling.
+
+**4.2 Color over time (for sequences / videos / series)**
+Even for AI stills, think in triptychs:
+*   Image 1: cold blue-green.
+*   Image 2: more neutral.
+*   Image 3: warm amber + reds.
+*   You’ve just built a micro emotional arc of “distance → awakening → connection.”
+*   *AI translation:* “limited color palette: deep emerald greens and dirty yellows, single red neon accent, high saturation, soft specular highlights” or “Wong Kar-wai inspired color design: heavy cyan shadows, warm tungsten skin tones, deep red background, smoky atmosphere, step-printed motion blur”
+
+**5. Emotion: what masters really design first**
+
+**5.1 Four emotional dials**
+When you plan an AI frame, decide:
+*   **Distance:** Intimate (extreme close-up, shallow DOF) vs. Alienated (small human in giant space).
+*   **Angle:** Low angle (power) vs. High angle (vulnerable).
+*   **Stability:** Stable, symmetrical (calm, fate) vs. Off-balance, tilted (instability, life).
+*   **Texture & mess:** Clean surfaces (control) vs. Dust, flares, raindrops (chaos, memory).
+
+**5.2 Hidden emotional devices**
+*   **Echoing body language in environment:** Curved, slumped character against drooping cables, sagging curtains.
+*   **Contradictory emotion:** Frame a smiling character in harsh, cold blue light with too much negative space.
+
+**6. Sound: designing a frame people can “hear”**
+
+Even for stills, think in terms of sound layers:
+*   **Near-field sounds** – what’s right next to the viewer (breath, clothes).
+*   **Mid-field** – what the subject hears (traffic, voices, wind).
+*   **Far-field** – city hum, distant thunder.
+*   **Designing for sound means:** Add visual elements that imply each layer (rattling signboard, open window, far city glow). Add movement cues (motion blur, wind in hair, ripples in water).
+
+**7. Converting all this into AI workflows**
+
+A reusable pattern for your thinking:
+*   **Intent block:** Emotion (“quiet dread”), Spatial depth (“tight room but long corridor behind”), Color story (“sickly greens + warm tungsten pockets”), Implied sound (“distant TV, fridge hum, rain”).
+*   **Technical block:** Lens + distance (“35mm lens, mid-shot”), Composition (“door frame foreground”), Light (“single overhead fluorescent”), Color (“greenish fluorescent cast”), Atmosphere (“humid air, reflections on tiled floor”).
+
 `;
 
 
