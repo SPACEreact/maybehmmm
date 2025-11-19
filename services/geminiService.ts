@@ -4,7 +4,7 @@ import { SHOT_TYPES, CAMERA_ANGLES, CAMERA_MOVEMENTS, FOCAL_LENGTHS, APERTURES, 
 
 const API_KEY = process.env.API_KEY;
 
-const ADVANCED_FILMMAKING_KNOWLEDGE_BASE = `
+const AI_CREATIVE_TEAM_KNOWLEDGE_BASE = `
 You are an AI Creative Team embodying a sophisticated, professional filmmaking philosophy. You operate as four distinct but collaborative personas: The Psychologist, The Cinematographer, The Sound Designer, and The Post-Production Supervisor. Your goal is to translate a scene's emotional subtext into a fully realized cinematic sequence.
 
 **PHILOSOPHY: "Emotion First, Technique Second"**
@@ -40,93 +40,63 @@ When providing the \`directorNotes\` for any shot, you MUST structure your respo
 - **Editor's Note (Feel):** Comment on the intended pace and editing feel.
 
 ---
-**KNOWLEDGE BASE**
+---
 
-**1. What “depth” actually is**
+# VERTICAL MYTHIC CINEMATOGRAPHY v1.2
+# Purpose: turn a one-sentence story beat into a 9:16 shot that moves, not just sits there.
 
-Think of depth in five layers:
+## 1. META-RULES (always follow)
+- 9:16 only. Never land locked-off unless the emotion is “stasis / death”.
+- Every shot must contain a micro-story: BEGIN → BEAT → PAYOFF in one take.
+- Camera is a character: its emotion = opposite or mirror of hero’s emotion (eg hero ego = camera humiliation later).
+- Vertical frame = use VERTICAL PARALLAX (boom, pendulum, crane, drop-drone) instead of traditional horizontal dolly.
+- Lens choice is emotional, not technical:
+  - 14-20mm = hubris / smallness
+  - 24-35mm = kinetic realism
+  - 50-60mm = mythic portraiture
+  - 85-100mm = obsession
+  - 200mm+ = fate / god POV
 
-*   **Spatial depth** – foreground/midground/background, parallax, perspective.
-*   **Psychological depth** – what the character feels vs what the frame shows.
-*   **Narrative depth** – what happened before/after this moment, implied in the frame.
-*   **Temporal depth** – traces of time (weathering, motion blur, echoes of a past event).
-*   **Sonic depth** – the “imagined soundscape” your viewer hears when they see the image.
+## 2. MOVE-SET LIBRARY (copy-paste into prompt)
+| Move Name            | Axis        | Gear                     | Emotion Trigger               | Typical Speeds / Notes |
+|----------------------|-------------|--------------------------|-------------------------------|------------------------|
+| Vertigo Boom         | Y + Zoom    | Gimbal + zoom servo      | Reality warping               | 3s boom, 30% zoom counter |
+| Pendulum Guillotine  | Arc         | 2-axis rig + counterweight | Ego death                     | 2m arc, 48fps |
+| Probe Whip           | Z + Pan     | 24mm probe on slider     | Intimacy → violence flip      | 10cm slide @ 120fps |
+| Wire-Cam Curtain     | X (vertical vine tunnel) | GoPro + fishing line | Revelation / calm after chaos | 8m slide, 32fps |
+| Drop-Drutch          | Y + Dutch   | Drone + post Dutch       | Humiliation                   | 5m drop, 30° rotate |
+| 360-Hand-Eclipse     | Rot + Track | Ring dolly around hands  | Compassion                    | 24fps, sun behind hands |
+| Micro-Heartbeat      | Z           | 5-axis macro stage       | Tension compression           | 5mm pulse per breath |
 
-Every choice in composition, framing, color, and sound should push at least one of these.
+## 3. SPEED-RAMP TABLE
+Real-time → Slow-motion breakpoints (always cut on impact or emotion peak, never on movement start):
 
-**2. Composition: from “nice” to “inevitable”**
+24fps ➜ 96fps (4×) = audience notices detail, still realistic  
+24fps ➜ 200fps (8×) = superhuman  
+24fps ➜ 500fps (20×) = cosmic stillness  
+24fps ➜ 1000fps+ (40×+) = molecular / god POV
 
-**2.1 Layering like Lubezki & Deakins**
-Advanced things to bake into every image:
-*   **Three planes, minimum:** Always design foreground / midground / background.
-    *   **Foreground:** partial occlusions (door frames, silhouettes, plants, glass, rails).
-    *   **Midground:** subject & key action.
-    *   **Background:** story context, light sources, or graphic shapes.
-    *   *Chivo (Lubezki) often shoots wide and very close to people, letting the world warp behind them for powerful parallax and depth.*
-*   **Diagonal energy:** Deakins talks about letting composition “serve the story and disappear.” A lot of his frames are subtle diagonals – eye-lines, horizon tilt, staircase lines – that move energy from one corner to another without screaming “Dutch angle.”
-*   **Use of obstacles:** Instead of putting the subject clean and centered, shoot through things (windows, curtains, people’s shoulders). Let 10–30% of the frame be “interference.” It creates depth + voyeurism.
+Rule: ramp into slomo over 5-7 frames, ramp out in 2 frames to feel like a “memory snap”.
 
-**2.2 Compression vs expansion**
-*   **Wide & close = immersive depth:** Chivo: extremely wide lenses close to the face, with the world bending and moving behind. The environment becomes part of the emotion (Tree of Life, The Revenant).
-*   **Long & far = psychological flattening:** Tarkovsky and some modern DPs compress space to make characters feel trapped or watched. Background creeps closer, perspective flattens, emotional tension rises.
-*   *AI translation (prompt ideas):* “shot on 24mm lens, camera very close to subject, strong foreground elements, deep background detail, cinematic parallax” or “shot on 85mm lens, compressed background, subject isolated against distant city, emotional claustrophobia”
+## 4. VFX & PRACTICAL CHEAT-SHEET
+- Earthquake: hidden 18V concrete vibrator under 3cm soil + 2D radial wave (After Effects) travelling @ 8m/s.  
+- Dust Bloom: 1kg cork powder in 1ms air-cannon triggered by laser break.  
+- Leaf Ripple: 0.25mm fishing line yanked by 12V winch; comp out line in post.  
+- Sun Eclipse: variable-ND on drone to lock sky, shoot at T2; practical flare, no CGI needed.  
+- Tear Refraction: place 45° mirror behind eye, project 320×240 micro-loop of Hanuman smile; catch reflection.
 
-**3. Framing: using space as psychology**
+## 5. PROMPT TEMPLATE (fill blanks)
+“9:16, {lens}mm, {move}, {fps}, {emotion-keyword}: {subject-action}, {vertical-parallax-device}, {light-quality}, {micro-story-begin} → {beat} → {payoff}, {vfx-practical}, {mythic-intensity-keyword}.”
 
-**3.1 Headroom, lead room, and “hostility”**
-*   Too much space above → character feels small, crushed by the world.
-*   Too little space → image feels anxious, uneasy.
-*   **Unbalanced lead room:** Put a character on the wrong side of the frame (looking toward the short side) to imply pressure or danger off-screen.
-*   *Deakins often frames characters against strong graphic shapes (door frames, windows, horizon lines) to define their mental state with geometry, not just expression.*
+Example:
+“9:16, 24mm probe, whip-pan-slide, 120fps, intimidation: monkey tail smears foreground → Bhima foot lands 2cm from lens, debris ricochets off glass, god-rays strobe through toes, kinetic dominance.”
 
-**3.2 Off-screen space as invisible depth**
-Tarkovsky and Wong Kar-wai both build tension from what we don’t see. You feel there’s a world just outside the frame. In AI images, you can signal off-screen space by:
-*   Strong eye-line toward the edge.
-*   Cropped hands / doors / vehicles halfway out of frame.
-*   Light or shadows entering from beyond the frame.
-*   *Prompt:* “character framed to the extreme left, large empty negative space on right, strong eye-line off-screen, subtle shadow entering frame from outside”
-
-**4. Color: Wong Kar-wai level emotional depth**
-
-**4.1 One dominant idea per frame**
-*   **Monochrome with accent** – mostly one hue with a single, sharp accent: Green world with a single red object (jealousy vs desire). Amber frame with a cyan window in the back (nostalgia vs distance).
-*   **Color as character:** Assign a color to an emotional state or character: Blue = regret. Red = impulse. Yellow = memory. When that color appears, you’re calling back to a feeling.
-
-**4.2 Color over time (for sequences / videos / series)**
-Even for AI stills, think in triptychs:
-*   Image 1: cold blue-green.
-*   Image 2: more neutral.
-*   Image 3: warm amber + reds.
-*   You’ve just built a micro emotional arc of “distance → awakening → connection.”
-*   *AI translation:* “limited color palette: deep emerald greens and dirty yellows, single red neon accent, high saturation, soft specular highlights” or “Wong Kar-wai inspired color design: heavy cyan shadows, warm tungsten skin tones, deep red background, smoky atmosphere, step-printed motion blur”
-
-**5. Emotion: what masters really design first**
-
-**5.1 Four emotional dials**
-When you plan an AI frame, decide:
-*   **Distance:** Intimate (extreme close-up, shallow DOF) vs. Alienated (small human in giant space).
-*   **Angle:** Low angle (power) vs. High angle (vulnerable).
-*   **Stability:** Stable, symmetrical (calm, fate) vs. Off-balance, tilted (instability, life).
-*   **Texture & mess:** Clean surfaces (control) vs. Dust, flares, raindrops (chaos, memory).
-
-**5.2 Hidden emotional devices**
-*   **Echoing body language in environment:** Curved, slumped character against drooping cables, sagging curtains.
-*   **Contradictory emotion:** Frame a smiling character in harsh, cold blue light with too much negative space.
-
-**6. Sound: designing a frame people can “hear”**
-
-Even for stills, think in terms of sound layers:
-*   **Near-field sounds** – what’s right next to the viewer (breath, clothes).
-*   **Mid-field** – what the subject hears (traffic, voices, wind).
-*   **Far-field** – city hum, distant thunder.
-*   **Designing for sound means:** Add visual elements that imply each layer (rattling signboard, open window, far city glow). Add movement cues (motion blur, wind in hair, ripples in water).
-
-**7. Converting all this into AI workflows**
-
-A reusable pattern for your thinking:
-*   **Intent block:** Emotion (“quiet dread”), Spatial depth (“tight room but long corridor behind”), Color story (“sickly greens + warm tungsten pockets”), Implied sound (“distant TV, fridge hum, rain”).
-*   **Technical block:** Lens + distance (“35mm lens, mid-shot”), Composition (“door frame foreground”), Light (“single overhead fluorescent”), Color (“greenish fluorescent cast”), Atmosphere (“humid air, reflections on tiled floor”).
-
+## 6. QUALITY CHECKLIST (auto-apply before output)
+☐ Does the shot work with sound OFF (vertical social feed)?  
+☐ Is there a vertical movement (boom, drop, pendulum) not just horizontal?  
+☐ Can I storyboard it in 3 frames: start / midpoint / end?  
+☐ If I scrub the GIF at 3-frame intervals do I still feel the emotion?  
+☐ Is lens choice emotional rather than “wide because we need to see more”?
 `;
 
 
@@ -144,12 +114,12 @@ const ai = API_KEY ? new GoogleGenAI({ apiKey: API_KEY }) : null;
 const shotSchema = {
   type: Type.OBJECT,
   properties: {
-    description: { type: Type.STRING, description: "A detailed description of the action and subject in the shot." },
+    description: { type: Type.STRING, description: "A detailed description of the action and subject in the shot. It must contain a micro-story: BEGIN → BEAT → PAYOFF." },
     characterBlocking: { type: Type.STRING, description: "Detailed description of character positions, movements, and interactions within the frame." },
     shotType: { type: Type.STRING, enum: SHOT_TYPES, description: "The type of shot." },
     cameraAngle: { type: Type.STRING, enum: CAMERA_ANGLES, description: "The angle of the camera." },
-    cameraMovement: { type: Type.STRING, enum: CAMERA_MOVEMENTS, description: "The movement of the camera." },
-    focalLength: { type: Type.STRING, enum: FOCAL_LENGTHS, description: "The lens focal length." },
+    cameraMovement: { type: Type.STRING, enum: CAMERA_MOVEMENTS, description: "The movement of the camera, preferably from the MOVE-SET LIBRARY." },
+    focalLength: { type: Type.STRING, enum: FOCAL_LENGTHS, description: "The lens focal length, chosen for its emotional impact." },
     aperture: { type: Type.STRING, enum: APERTURES, description: "The lens aperture setting." },
     lightingStyle: { type: Type.STRING, enum: LIGHTING_STYLES, description: "The overall lighting style." },
     colorGrade: { type: Type.STRING, enum: COLOR_GRADES, description: "The color grading style." },
@@ -175,11 +145,11 @@ export const generateShotsFromScript = async (script: string, directorInstructio
     if (!ai || !isApiKeySet()) return Promise.resolve({ story: { title: '', logline: ''}, shots: []});
 
     const prompt = `
-        ${ADVANCED_FILMMAKING_KNOWLEDGE_BASE}
+        ${AI_CREATIVE_TEAM_KNOWLEDGE_BASE}
 
-        Your task is to act as the AI Creative Team for a fast-paced Instagram Reel.
-        Analyze the following script, extract a 'title' and 'logline', and break it down into a visually dynamic shot list.
-        For each sequence, infer the emotional core and apply your full Chain of Command.
+        Your task is to act as the AI Creative Team for a fast-paced Instagram Reel, applying the principles of VERTICAL MYTHIC CINEMATOGRAPHY.
+        Analyze the following script, extract a 'title' and 'logline', and break it down into a visually dynamic 9:16 shot list.
+        For each sequence, infer the emotional core and apply your full Chain of Command. The shots MUST be dynamic and feature vertical parallax, as described in the guide. Use the MOVE-SET LIBRARY for camera movements.
         The directorNotes for each shot MUST follow the 'Justification Mandate'.
 
         IMPORTANT PACING INSTRUCTION: The pacing must be extremely fast, suitable for content with a 95 bpm tempo. Generate a high density of shots, aiming for at least 14-15 shots for what would be roughly one minute of screen time. Prioritize quick cuts, visual variety, and maintaining high energy to keep the audience engaged.
@@ -247,10 +217,10 @@ export const getInitialScene = async (story: Story, directorVision: DirectorVisi
     if (!ai || !isApiKeySet()) return Promise.resolve([]);
 
     const prompt = `
-        ${ADVANCED_FILMMAKING_KNOWLEDGE_BASE}
+        ${AI_CREATIVE_TEAM_KNOWLEDGE_BASE}
 
-        As the AI Creative Team, create an initial shot list of 5-7 shots for a scene.
-        Your primary directive is the Scene's Emotional Core. Every decision must flow from this "Why."
+        As the AI Creative Team, create an initial shot list of 5-7 shots for a scene, adhering to the VERTICAL MYTHIC CINEMATOGRAPHY guide.
+        Your primary directive is the Scene's Emotional Core. Every decision must flow from this "Why." All shots must be 9:16 and dynamic. Use the MOVE-SET LIBRARY.
 
         **Scene's Emotional Core:** "${sceneEmotionalCore}"
 
@@ -302,10 +272,10 @@ export const getGeminiSceneSuggestions = async (story: Story, directorVision: Di
   if (!ai || !isApiKeySet()) return Promise.resolve([]);
   
   const prompt = `
-    ${ADVANCED_FILMMAKING_KNOWLEDGE_BASE}
+    ${AI_CREATIVE_TEAM_KNOWLEDGE_BASE}
 
-    As the AI Creative Team, generate a sequence of 3-5 cinematic shots.
-    Your entire creative process MUST be driven by the scene's emotional core.
+    As the AI Creative Team, generate a sequence of 3-5 cinematic 9:16 shots based on the VERTICAL MYTHIC CINEMATOGRAPHY guide.
+    Your entire creative process MUST be driven by the scene's emotional core. Use the MOVE-SET LIBRARY.
 
     **Scene's Emotional Core:** "${sceneEmotionalCore}"
 
@@ -364,10 +334,10 @@ export const getGeminiShotDetails = async (story: Story, directorVision: Directo
   if (!ai || !isApiKeySet()) return Promise.resolve({});
 
   const contextPrompt = `
-    ${ADVANCED_FILMMAKING_KNOWLEDGE_BASE}
+    ${AI_CREATIVE_TEAM_KNOWLEDGE_BASE}
 
-    As the AI Creative Team, for the given shot description, determine the optimal cinematic choices.
-    Your entire process is driven by the emotional core.
+    As the AI Creative Team, for the given shot description, determine the optimal cinematic choices according to the VERTICAL MYTHIC CINEMATOGRAPHY guide.
+    Your entire process is driven by the emotional core. All choices must be for a 9:16 aspect ratio.
 
     **Scene's Emotional Core:** "${sceneEmotionalCore}"
     
@@ -406,10 +376,10 @@ export const getGeminiShotDetails = async (story: Story, directorVision: Directo
 export const getDirectorNoteSuggestion = async (story: Story, directorVision: DirectorVision, shot: Shot, sceneEmotionalCore: string): Promise<string> => {
     if (!ai || !isApiKeySet()) return Promise.resolve('');
     const prompt = `
-        ${ADVANCED_FILMMAKING_KNOWLEDGE_BASE}
+        ${AI_CREATIVE_TEAM_KNOWLEDGE_BASE}
         
         As the AI Creative Team, analyze the following shot and generate ONLY the text for the director's note.
-        The note MUST follow the Justification Mandate (Why, How, Feel).
+        The note MUST follow the Justification Mandate (Why, How, Feel). It should incorporate principles from the VERTICAL MYTHIC CINEMATOGRAPHY guide.
 
         **Scene's Emotional Core:** "${sceneEmotionalCore}"
         Story: ${story.logline}
@@ -432,10 +402,10 @@ export const getDirectorNoteSuggestion = async (story: Story, directorVision: Di
 export const makePromptCinematic = async (prompt: string): Promise<string> => {
     if (!ai || !isApiKeySet()) return Promise.resolve(prompt);
     const rewritePrompt = `
-        You are a master prompt engineer and a visionary cinematographer.
-        Rewrite the following prompt to be more cinematic, descriptive, and evocative.
-        Add nuances of mood, texture, lighting, and emotional weight.
-        Preserve the core intent of the original prompt but elevate it to a professional, artistic level.
+        You are a master prompt engineer and a visionary cinematographer specializing in vertical video.
+        Rewrite the following prompt to be more cinematic, descriptive, and evocative, using the principles of the VERTICAL MYTHIC CINEMATOGRAPHY guide.
+        Add nuances of mood, texture, lighting, emotional weight, and dynamic movement.
+        Preserve the core intent of the original prompt but elevate it to a professional, artistic level for a 9:16 aspect ratio.
 
         Original Prompt:
         ---
@@ -514,7 +484,7 @@ export const generateSoundscape = async (story: Story, directorVision: DirectorV
   const shotList = shots.map((shot, index) => `Shot ${index + 1} (ID: ${shot.id}): ${shot.description}`).join('\n');
 
   const prompt = `
-    ${ADVANCED_FILMMAKING_KNOWLEDGE_BASE}
+    ${AI_CREATIVE_TEAM_KNOWLEDGE_BASE}
 
     As the AI Creative Team, specifically embodying The Sound Designer persona, generate a complete soundscape for the following scene.
     Your analysis must be rooted in the scene's emotional core, derived from the story context.

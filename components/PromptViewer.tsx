@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import type { Shot, Story, Soundscape, ShotSoundDesign } from '../types';
 import { CopyIcon, CameraIcon, VideoCameraIcon, MagicIcon } from './Icon';
@@ -59,25 +58,31 @@ const generateImagePrompt = (story: Story, shot: Shot, directorInstructions?: st
 };
 
 const generateVideoPrompt = (story: Story, shot: Shot, soundDesign: ShotSoundDesign | undefined, directorInstructions?: string): string => {
-  const hasMovement = shot.cameraMovement && shot.cameraMovement !== "Static";
-  const characterNames = story.characters.length > 0
-    ? story.characters.map(c => c.name).join(' and ')
-    : '';
+  // Extract emotion from director's notes (which follow Why/How/Feel)
+  const directorNotesEmotion = shot.directorNotes.match(/Why: (.*?)\.?\s/i)?.[1] || shot.directorNotes.match(/Psychologist's Insight \(Why\): (.*?)\.?\s/i)?.[1];
+
+  // Micro-story from description. The AI is now prompted to make this a micro-story.
+  const microStory = shot.description;
+  const blocking = shot.characterBlocking;
+
+  // Use a keyword from the director's notes, or fallback to something from the vision.
+  const emotionKeyword = directorNotesEmotion ? directorNotesEmotion.toLowerCase() : 'cinematic';
+  
+  const subjectAction = buildPrompt([microStory, blocking]);
 
   return buildPrompt([
-    hasMovement
-      ? `${shot.cameraMovement?.toLowerCase()} camera move tracking ${shot.description}`
-      : `${shot.shotType ? shot.shotType.toLowerCase() : 'cinematic'} shot capturing ${shot.description}`,
-    shot.characterBlocking && `Character blocking emphasizes ${shot.characterBlocking}`,
-    characterNames && `Featuring ${characterNames}`,
-    story.setting.name && `Located in ${story.setting.name}, which is ${story.setting.description}`,
-    shot.cameraAngle && `Filmed from a ${shot.cameraAngle.toLowerCase()} angle`,
-    shot.lightingStyle && `${shot.lightingStyle.toLowerCase()} lighting defines the atmosphere`,
-    shot.colorGrade && `Finished with a ${shot.colorGrade.toLowerCase()} color grade`,
-    shot.focalLength && `Captured using a ${shot.focalLength} lens`,
-    soundDesign?.sfx && `Key sound effect: ${soundDesign.sfx}`,
-    directorInstructions && `Honor the director's notes: ${directorInstructions}`,
-    'Deliver as cinematic motion footage in 4K with dynamic action and refined film grain'
+      `9:16 vertical aspect ratio`,
+      `hyper-cinematic shot, style of ${story.logline}`,
+      shot.focalLength,
+      `camera movement: ${shot.cameraMovement}`,
+      `the core emotion is ${emotionKeyword}`,
+      subjectAction,
+      `lighting style: ${shot.lightingStyle}`,
+      `color grade: ${shot.colorGrade}, inspired by ${story.setting.name}`,
+      `composition is ${shot.composition}`,
+      soundDesign?.sfx && `key sound is ${soundDesign.sfx}`,
+      directorInstructions && `director's instructions: ${directorInstructions}`,
+      `mythic intensity, visceral, 8k detail, subtle film grain, cinematic motion blur.`
   ]);
 };
 
